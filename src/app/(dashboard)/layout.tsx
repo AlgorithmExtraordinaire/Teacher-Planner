@@ -2,13 +2,33 @@ import Link from "next/link";
 import { requireUser } from "@/lib/dal";
 import { logout } from "@/app/login/actions";
 
-const NAV_ITEMS = [
-  { href: "/", label: "Command Center" },
-  { href: "/roster", label: "Roster" },
-  { href: "/calendar", label: "Academic Calendar" },
-  { href: "/standards", label: "Curriculum Standards" },
-  { href: "/lesson-plans", label: "Lesson Plans" },
-  { href: "/assessments", label: "Assessments" },
+const NAV_SECTIONS = [
+  {
+    label: "Dashboards",
+    items: [
+      { href: "/", label: "Command Center" },
+      { href: "/lesson-plans/new", label: "Lesson Plan Generator" },
+    ],
+  },
+  {
+    label: "Intelligence",
+    items: [
+      { href: "/agent", label: "Assistant" },
+      { href: "/agent/proposals", label: "Proposals" },
+      { href: "/workflows", label: "Workflows" },
+    ],
+  },
+  {
+    label: "Records",
+    items: [
+      { href: "/roster", label: "Roster" },
+      { href: "/calendar", label: "Academic Calendar" },
+      { href: "/standards", label: "Curriculum Standards" },
+      { href: "/lesson-plans", label: "Lesson Plans" },
+      { href: "/assessments", label: "Assessments" },
+      { href: "/tables", label: "All Tables" },
+    ],
+  },
 ];
 
 export default async function DashboardLayout({
@@ -27,15 +47,22 @@ export default async function DashboardLayout({
           </p>
           <p className="text-xs text-slate-500">Swakopmund Christian Academy</p>
         </div>
-        <nav className="flex flex-1 flex-col gap-1">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded-md px-2 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-            >
-              {item.label}
-            </Link>
+        <nav className="flex flex-1 flex-col gap-6">
+          {NAV_SECTIONS.map((section) => (
+            <div key={section.label} className="flex flex-col gap-1">
+              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                {section.label}
+              </p>
+              {section.items.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="rounded-md px-2 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           ))}
         </nav>
       </aside>
