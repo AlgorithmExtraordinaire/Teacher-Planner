@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getSpecialist } from "@/lib/agent/personas";
 import { AgentChat } from "@/app/(dashboard)/agent/[id]/agent-chat";
 
-type Block = { type: string; text?: string };
+type TextContent = { type: string; text?: string };
+type Step = { type: string; content?: TextContent[] };
 
 export default async function ConversationPage({
   params,
@@ -28,17 +29,19 @@ export default async function ConversationPage({
     .eq("conversation_id", id)
     .order("created_at", { ascending: true });
 
-  // Collapse stored content blocks into display turns, dropping tool-call
+  // Collapse stored interaction steps into display turns, dropping tool-call
   // scaffolding — the transcript should read like a conversation.
   const turns = (messages ?? [])
     .map((m) => {
-      const blocks = (m.content ?? []) as Block[];
-      const text = blocks
-        .filter((b) => b.type === "text")
-        .map((b) => b.text ?? "")
+      const steps = (m.content ?? []) as unknown as Step[];
+      const text = steps
+        .filter((s) => s.type === "user_input" || s.type === "model_output")
+        .flatMap((s) => s.content ?? [])
+        .filter((c) => c.type === "text")
+        .map((c) => c.text ?? "")
         .join("")
         .trim();
-      const tools = blocks.filter((b) => b.type === "tool_use").length;
+      const tools = steps.filter((s) => s.type === "function_call").length;
       return {
         role: m.role as "user" | "assistant",
         text,

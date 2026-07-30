@@ -1,6 +1,13 @@
 import "server-only";
-import type Anthropic from "@anthropic-ai/sdk";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+/** Gemini function-tool declaration (`FunctionT` in @google/genai). */
+type FunctionTool = {
+  type: "function";
+  name: string;
+  description: string;
+  parameters: Record<string, unknown>;
+};
 
 // Agent tools.
 //
@@ -33,13 +40,14 @@ const READABLE = [
 
 const MAX_ROWS = 100;
 
-export const AGENT_TOOLS: Anthropic.Tool[] = [
+export const AGENT_TOOLS: FunctionTool[] = [
   {
+    type: "function",
     name: "query_table",
     description: `Read rows from one of the school's tables. Use this whenever a question depends on what is actually recorded. Returns at most ${MAX_ROWS} rows.
 
 Available tables: ${READABLE.join(", ")}.`,
-    input_schema: {
+    parameters: {
       type: "object",
       properties: {
         table: {
@@ -82,10 +90,11 @@ Available tables: ${READABLE.join(", ")}.`,
     },
   },
   {
+    type: "function",
     name: "count_rows",
     description:
       "Count rows in a table, optionally filtered. Cheaper than query_table when you only need a number.",
-    input_schema: {
+    parameters: {
       type: "object",
       properties: {
         table: { type: "string", enum: [...READABLE] },
@@ -109,9 +118,10 @@ Available tables: ${READABLE.join(", ")}.`,
     },
   },
   {
+    type: "function",
     name: "propose_action",
     description: `Propose a change to the school's data. This does NOT apply the change — it queues a proposal for a human to review and approve. Tell the user you have proposed it and that it awaits approval.`,
-    input_schema: {
+    parameters: {
       type: "object",
       properties: {
         action_type: {

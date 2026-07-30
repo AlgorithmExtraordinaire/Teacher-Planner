@@ -1,4 +1,4 @@
-﻿import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/dal";
 import { AGENT_TOOLS, executeTool } from "@/lib/agent/tools";
@@ -6,20 +6,27 @@ import { buildSystemPrompt, getSpecialist } from "@/lib/agent/personas";
 
 export const maxDuration = 120;
 
-const MODEL = "claude-opus-5";
+const MODEL = "gemini-3.1-flash-lite";
 const MAX_TOOL_ROUNDS = 8;
+
+// Interaction steps, as sent to and received from the Gemini interactions API.
+// We replay the transcript ourselves (`store: false`) so the school's own
+// database stays the single source of truth and Google retains nothing.
+type TextContent = { type: "text"; text: string };
+type Step =
+  | { type: "user_input"; content: TextContent[] }
+  | { type: "model_output"; content?: TextContent[] }
+  | { type: "function_call"; id: string; name: string; arguments: Record<string, unknown> }
+  | { type: "function_result"; call_id: string; name?: string; result: string; is_error?: boolean }
+  | { type: string; [k: string]: unknown };
 
 function sse(event: string, data: unknown) {
   return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
 }
 
-/**
- * Anthropic's content blocks are structurally JSON but don't carry the index
- * signature Supabase's `Json` type wants. This is the one boundary where that
- * matters.
- */
+/** Steps are structurally JSON; Supabase's `Json` type wants an index signature. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const asJson = (blocks: unknown) => blocks as any;
+const asJson = (value: unknown) => value as any;
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
@@ -27,11 +34,11 @@ export async function POST(request: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     return new Response(
       JSON.stringify({
         error:
-          "The assistant is not configured yet — ANTHROPIC_API_KEY is missing on the server.",
+          "The assistant is not configured yet — GEMINI_API_KEY is missing on the server.",
       }),
       { status: 503, headers: { "content-type": "application/json" } },
     );
@@ -57,30 +64,32 @@ export async function POST(request: Request) {
     return new Response("Conversation not found", { status: 404 });
   }
 
-  // Load prior turns, then append the new one.
+  // Rebuild the transcript from our own records.
   const { data: history } = await supabase
     .from("agent_messages")
-    .select("role, content")
+    .select("content")
     .eq("conversation_id", conversationId)
     .order("created_at", { ascending: true });
 
-  const messages: Anthropic.MessageParam[] = (history ?? []).map((m) => ({
-    role: m.role as "user" | "assistant",
-    // Stored as jsonb; the shape is Anthropic's own content blocks.
-    content: m.content as unknown as Anthropic.ContentBlockParam[],
-  }));
+  const steps: Step[] = (history ?? []).flatMap(
+    (row) => (row.content ?? []) as unknown as Step[],
+  );
 
-  messages.push({ role: "user", content: [{ type: "text", text: userMessage }] });
+  const userStep: Step = {
+    type: "user_input",
+    content: [{ type: "text", text: userMessage }],
+  };
+  steps.push(userStep);
 
   await supabase.from("agent_messages").insert({
     conversation_id: conversationId,
     role: "user",
-    content: [{ type: "text", text: userMessage }],
+    content: asJson([userStep]),
   });
 
   const specialist = getSpecialist(conversation.specialist);
-  const system = buildSystemPrompt(specialist, user);
-  const anthropic = new Anthropic();
+  const systemInstruction = buildSystemPrompt(specialist, user);
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -89,40 +98,109 @@ export async function POST(request: Request) {
 
       try {
         for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-          const modelStream = anthropic.messages.stream({
+          const modelStream = await ai.interactions.create({
             model: MODEL,
-            max_tokens: 16000,
-            system,
-            tools: AGENT_TOOLS,
-            thinking: { type: "adaptive" },
-            messages,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            input: steps as any,
+            system_instruction: systemInstruction,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            tools: AGENT_TOOLS as any,
+            store: false,
+            stream: true,
           });
 
-          modelStream.on("text", (delta) => send("text", { delta }));
+          let assistantText = "";
+          const calls: {
+            id: string;
+            name: string;
+            args: Record<string, unknown>;
+          }[] = [];
+          // function_call arguments arrive as a JSON string across deltas
+          const argBuffers = new Map<number, string>();
+          const callMeta = new Map<number, { id: string; name: string }>();
 
-          const message = await modelStream.finalMessage();
+          for await (const event of modelStream) {
+            if (event.event_type === "step.start") {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const step = (event as any).step;
+              if (step?.type === "function_call") {
+                callMeta.set(Number((event as { index?: number }).index ?? 0), {
+                  id: String(step.id ?? ""),
+                  name: String(step.name ?? ""),
+                });
+              }
+              continue;
+            }
 
-          if (message.stop_reason === "refusal") {
-            send("error", {
-              message:
-                "The assistant declined to answer that. Try rephrasing, or ask a staff member.",
-            });
-            break;
+            if (event.event_type !== "step.delta") continue;
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const delta = (event as any).delta;
+            const index = Number((event as { index?: number }).index ?? 0);
+
+            if (delta?.type === "text" && typeof delta.text === "string") {
+              assistantText += delta.text;
+              send("text", { delta: delta.text });
+            } else if (delta?.type === "arguments") {
+              argBuffers.set(
+                index,
+                (argBuffers.get(index) ?? "") + String(delta.arguments ?? ""),
+              );
+              if (delta.id || delta.name) {
+                callMeta.set(index, {
+                  id: String(delta.id ?? callMeta.get(index)?.id ?? ""),
+                  name: String(delta.name ?? callMeta.get(index)?.name ?? ""),
+                });
+              }
+            } else if (delta?.type === "function_call") {
+              calls.push({
+                id: String(delta.id ?? ""),
+                name: String(delta.name ?? ""),
+                args: (delta.arguments ?? {}) as Record<string, unknown>,
+              });
+            }
           }
 
-          messages.push({ role: "assistant", content: message.content });
+          // Fold any streamed argument buffers into concrete calls.
+          for (const [index, raw] of argBuffers) {
+            const meta = callMeta.get(index);
+            if (!meta?.name) continue;
+            let args: Record<string, unknown> = {};
+            try {
+              args = raw ? JSON.parse(raw) : {};
+            } catch {
+              args = {};
+            }
+            calls.push({ id: meta.id, name: meta.name, args });
+          }
 
-          const toolUses = message.content.filter(
-            (b): b is Anthropic.ToolUseBlock => b.type === "tool_use",
-          );
-
-          // No tools requested — this is the final answer for the turn.
-          if (toolUses.length === 0) {
-            await supabase.from("agent_messages").insert({
-              conversation_id: conversationId,
-              role: "assistant",
-              content: asJson(message.content),
+          const producedSteps: Step[] = [];
+          if (assistantText) {
+            producedSteps.push({
+              type: "model_output",
+              content: [{ type: "text", text: assistantText }],
             });
+          }
+          for (const c of calls) {
+            producedSteps.push({
+              type: "function_call",
+              id: c.id,
+              name: c.name,
+              arguments: c.args,
+            });
+          }
+
+          steps.push(...producedSteps);
+
+          // No tool calls — the turn is complete.
+          if (calls.length === 0) {
+            if (producedSteps.length > 0) {
+              await supabase.from("agent_messages").insert({
+                conversation_id: conversationId,
+                role: "assistant",
+                content: asJson(producedSteps),
+              });
+            }
             await supabase
               .from("agent_conversations")
               .update({ updated_at: new Date().toISOString() })
@@ -130,36 +208,35 @@ export async function POST(request: Request) {
             break;
           }
 
-          const results: Anthropic.ToolResultBlockParam[] = [];
-          for (const tool of toolUses) {
-            send("tool", { name: tool.name });
+          const resultSteps: Step[] = [];
+          for (const call of calls) {
+            send("tool", { name: call.name });
 
-            const outcome = await executeTool(
-              tool.name,
-              tool.input as Record<string, unknown>,
-              { supabase, profileId: user.id, conversationId },
-            );
+            const outcome = await executeTool(call.name, call.args, {
+              supabase,
+              profileId: user.id,
+              conversationId,
+            });
 
             if (outcome.proposedActionId) {
               send("proposal", { id: outcome.proposedActionId });
             }
 
-            results.push({
-              type: "tool_result",
-              tool_use_id: tool.id,
-              content: outcome.content,
+            resultSteps.push({
+              type: "function_result",
+              call_id: call.id,
+              name: call.name,
+              result: outcome.content,
             });
           }
 
-          // Persist the assistant turn (with its tool calls) and the results,
-          // so the conversation replays correctly on reload.
+          steps.push(...resultSteps);
+
           await supabase.from("agent_messages").insert({
             conversation_id: conversationId,
             role: "assistant",
-            content: asJson(message.content),
+            content: asJson([...producedSteps, ...resultSteps]),
           });
-
-          messages.push({ role: "user", content: results });
         }
 
         send("done", {});
@@ -181,4 +258,3 @@ export async function POST(request: Request) {
     },
   });
 }
-

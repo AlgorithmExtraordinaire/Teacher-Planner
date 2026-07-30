@@ -31,7 +31,7 @@ asked for. Schema is applied; application code is being built.
 | Schema (`workflows`, `workflow_runs`, `agent_conversations`, `agent_messages`, `agent_actions`) | ✅ Applied | Migration `0004_agent_and_workflows.sql`, RLS enabled |
 | **Tables** — all 19 tables browsable | ⏳ To build | Data-driven registry + `/tables/[table]` |
 | **Workflows** — built-in rule evaluators + runner | ⏳ To build | Rules are built-in and parameterised; an LLM selects a rule, it never writes SQL that runs unattended |
-| **Agent** — Claude Opus 5 with tool use over school data | ⏳ To build | Read tools run under the caller's session so RLS applies; writes are proposals |
+| **Agent** — Gemini 3.1 Flash-Lite with tool use over school data | ✅ Built | Read tools run under the caller's session so RLS applies; writes are proposals |
 | **Approval queue** — human-in-the-loop for agent writes | ⏳ To build | `agent_actions`; nothing mutates school data without a human approving it |
 | **Dashboards** — enriched Overview + AI Lesson Plan Generator | ⏳ To build | |
 
@@ -47,8 +47,10 @@ asked for. Schema is applied; application code is being built.
   hard-coded evaluators. An LLM chooses a rule and its parameters; it never
   emits SQL that executes on a schedule.
 
-Requires an `ANTHROPIC_API_KEY` in the droplet's `.env` before the agent
-features function.
+Requires a `GEMINI_API_KEY` in the droplet's `.env` before the agent features
+function. The conversation is replayed from our own `agent_messages` table with
+`store: false`, so Google retains no transcript — the school's database is the
+only record.
 
 ## Phase 2 — Data model corrections
 
