@@ -109,85 +109,103 @@ export async function POST(request: Request) {
             stream: true,
           });
 
-          let assistantText = "";
-          const calls: {
-            id: string;
-            name: string;
-            args: Record<string, unknown>;
-          }[] = [];
-          // function_call arguments arrive as a JSON string across deltas
-          const argBuffers = new Map<number, string>();
-          const callMeta = new Map<number, { id: string; name: string }>();
+          // The wire protocol is: step.start announces a step (with its type and,
+          // for function calls, id + name), step.delta carries incremental
+          // payload keyed by the same index, step.stop closes it. Accumulate per
+          // index rather than guessing, so text, tool args, and thought
+          // signatures each land in the right place.
+          type Pending = {
+            type: string;
+            id?: string;
+            name?: string;
+            text: string;
+            argsRaw: string;
+            signature?: string;
+          };
+          const pending = new Map<number, Pending>();
 
-          for await (const event of modelStream) {
+          const slot = (index: number, type = ""): Pending => {
+            const existing = pending.get(index);
+            if (existing) return existing;
+            const fresh: Pending = { type, text: "", argsRaw: "" };
+            pending.set(index, fresh);
+            return fresh;
+          };
+
+          for await (const raw of modelStream) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const event = raw as any;
+            const index = Number(event.index ?? 0);
+
             if (event.event_type === "step.start") {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const step = (event as any).step;
-              if (step?.type === "function_call") {
-                callMeta.set(Number((event as { index?: number }).index ?? 0), {
-                  id: String(step.id ?? ""),
-                  name: String(step.name ?? ""),
-                });
-              }
+              const step = event.step ?? {};
+              const s = slot(index, String(step.type ?? ""));
+              s.type = String(step.type ?? s.type);
+              if (step.id) s.id = String(step.id);
+              if (step.name) s.name = String(step.name);
               continue;
             }
 
             if (event.event_type !== "step.delta") continue;
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const delta = (event as any).delta;
-            const index = Number((event as { index?: number }).index ?? 0);
+            const delta = event.delta ?? {};
+            const s = slot(index);
 
-            if (delta?.type === "text" && typeof delta.text === "string") {
-              assistantText += delta.text;
-              send("text", { delta: delta.text });
-            } else if (delta?.type === "arguments") {
-              argBuffers.set(
-                index,
-                (argBuffers.get(index) ?? "") + String(delta.arguments ?? ""),
-              );
-              if (delta.id || delta.name) {
-                callMeta.set(index, {
-                  id: String(delta.id ?? callMeta.get(index)?.id ?? ""),
-                  name: String(delta.name ?? callMeta.get(index)?.name ?? ""),
-                });
-              }
-            } else if (delta?.type === "function_call") {
-              calls.push({
-                id: String(delta.id ?? ""),
-                name: String(delta.name ?? ""),
-                args: (delta.arguments ?? {}) as Record<string, unknown>,
-              });
+            switch (delta.type) {
+              case "text":
+                s.text += String(delta.text ?? "");
+                send("text", { delta: String(delta.text ?? "") });
+                break;
+              // Tool arguments stream as a JSON string, in one or more chunks.
+              case "arguments_delta":
+              case "arguments":
+                s.argsRaw += String(delta.arguments ?? "");
+                break;
+              case "thought_signature":
+                s.signature = String(delta.signature ?? "");
+                break;
             }
-          }
-
-          // Fold any streamed argument buffers into concrete calls.
-          for (const [index, raw] of argBuffers) {
-            const meta = callMeta.get(index);
-            if (!meta?.name) continue;
-            let args: Record<string, unknown> = {};
-            try {
-              args = raw ? JSON.parse(raw) : {};
-            } catch {
-              args = {};
-            }
-            calls.push({ id: meta.id, name: meta.name, args });
           }
 
           const producedSteps: Step[] = [];
-          if (assistantText) {
-            producedSteps.push({
-              type: "model_output",
-              content: [{ type: "text", text: assistantText }],
-            });
-          }
-          for (const c of calls) {
-            producedSteps.push({
-              type: "function_call",
-              id: c.id,
-              name: c.name,
-              arguments: c.args,
-            });
+          const calls: {
+            id: string;
+            name: string;
+            args: Record<string, unknown>;
+          }[] = [];
+
+          for (const index of [...pending.keys()].sort((a, b) => a - b)) {
+            const s = pending.get(index)!;
+
+            if (s.type === "thought") {
+              // Replayed so the model keeps its reasoning thread across turns.
+              producedSteps.push(
+                s.signature
+                  ? { type: "thought", signature: s.signature }
+                  : { type: "thought" },
+              );
+            } else if (s.type === "model_output" && s.text) {
+              producedSteps.push({
+                type: "model_output",
+                content: [{ type: "text", text: s.text }],
+              });
+            } else if (s.type === "function_call" && s.name) {
+              let args: Record<string, unknown> = {};
+              if (s.argsRaw) {
+                try {
+                  args = JSON.parse(s.argsRaw);
+                } catch {
+                  args = {};
+                }
+              }
+              calls.push({ id: s.id ?? "", name: s.name, args });
+              producedSteps.push({
+                type: "function_call",
+                id: s.id ?? "",
+                name: s.name,
+                arguments: args,
+              });
+            }
           }
 
           steps.push(...producedSteps);
