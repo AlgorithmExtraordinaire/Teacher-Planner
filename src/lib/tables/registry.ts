@@ -35,6 +35,7 @@ export const TABLE_GROUPS = [
   "Assessment",
   "Monitoring",
   "Integrations",
+  "Resources",
   "Automation",
 ] as const;
 
@@ -304,6 +305,61 @@ export const TABLES: TableSpec[] = [
       { key: "notes", label: "Notes" },
     ],
     orderBy: { column: "platform_name", ascending: true },
+  },
+
+  // ---------------------------------------------------------------- Resources
+  {
+    name: "resource_collections",
+    label: "Resource Collections",
+    group: "Resources",
+    description: "Drive folder tree: subject → grade → module.",
+    columns: [
+      { key: "path", label: "Path" },
+      { key: "subject", label: "Subject" },
+      { key: "grade_level", label: "Grade" },
+      { key: "module_name", label: "Module" },
+      { key: "depth", label: "Depth", kind: "number" },
+    ],
+    orderBy: { column: "path", ascending: true },
+  },
+  {
+    name: "resources",
+    label: "Resource Files",
+    group: "Resources",
+    description: "Individual books, PDFs, and links from Drive and Moodle.",
+    columns: [
+      { key: "name", label: "Name" },
+      { key: "source", label: "Source", kind: "badge" },
+      { key: "kind", label: "Kind", kind: "badge" },
+      { key: "doc_role", label: "Role", kind: "badge" },
+      { key: "file_size", label: "Bytes", kind: "number" },
+    ],
+    orderBy: { column: "name", ascending: true },
+  },
+  {
+    name: "resource_categories",
+    label: "Moodle Categories",
+    group: "Resources",
+    description: "Grade categories mirrored from the Moodle instance.",
+    columns: [
+      { key: "name", label: "Category" },
+      { key: "grade_band", label: "Grade band" },
+      { key: "course_count", label: "Courses", kind: "number" },
+      { key: "last_synced_at", label: "Synced", kind: "date" },
+    ],
+    orderBy: { column: "sort_order", ascending: true },
+  },
+  {
+    name: "planner_folders",
+    label: "Planner Folders",
+    group: "Resources",
+    description: "Teacher hanging folders.",
+    columns: [
+      { key: "name", label: "Folder" },
+      { key: "is_ai_generated", label: "AI suggested", kind: "bool" },
+      { key: "created_at", label: "Created", kind: "date" },
+    ],
+    orderBy: { column: "name", ascending: true },
   },
 
   // --------------------------------------------------------------- Automation

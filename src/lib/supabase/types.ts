@@ -15,6 +15,323 @@ export type Database = {
   }
   public: {
     Tables: {
+      // --- Curriculum resources & planner folders (migrations 0005-0006).
+      // Hand-added; fold into the generated block on the next full regen.
+      resource_categories: {
+        Row: {
+          id: string
+          moodle_category_id: number
+          name: string
+          grade_band: string | null
+          grade_level: string | null
+          course_count: number | null
+          sort_order: number
+          last_synced_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          moodle_category_id: number
+          name: string
+          grade_band?: string | null
+          grade_level?: string | null
+          course_count?: number | null
+          sort_order?: number
+          last_synced_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          moodle_category_id?: number
+          name?: string
+          grade_band?: string | null
+          grade_level?: string | null
+          course_count?: number | null
+          sort_order?: number
+          last_synced_at?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      resource_courses: {
+        Row: {
+          id: string
+          moodle_course_id: number
+          category_id: string | null
+          fullname: string
+          shortname: string | null
+          subject: string | null
+          summary: string | null
+          visible: boolean
+          last_synced_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          moodle_course_id: number
+          category_id?: string | null
+          fullname: string
+          shortname?: string | null
+          subject?: string | null
+          summary?: string | null
+          visible?: boolean
+          last_synced_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          moodle_course_id?: number
+          category_id?: string | null
+          fullname?: string
+          shortname?: string | null
+          subject?: string | null
+          summary?: string | null
+          visible?: boolean
+          last_synced_at?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      resource_collections: {
+        Row: {
+          id: string
+          source: string
+          drive_folder_id: string | null
+          parent_id: string | null
+          name: string
+          subject: string | null
+          grade_level: string | null
+          grade_band: string | null
+          module_name: string | null
+          depth: number
+          path: string | null
+          view_url: string | null
+          last_synced_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          source?: string
+          drive_folder_id?: string | null
+          parent_id?: string | null
+          name: string
+          subject?: string | null
+          grade_level?: string | null
+          grade_band?: string | null
+          module_name?: string | null
+          depth?: number
+          path?: string | null
+          view_url?: string | null
+          last_synced_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          source?: string
+          drive_folder_id?: string | null
+          parent_id?: string | null
+          name?: string
+          subject?: string | null
+          grade_level?: string | null
+          grade_band?: string | null
+          module_name?: string | null
+          depth?: number
+          path?: string | null
+          view_url?: string | null
+          last_synced_at?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      resources: {
+        Row: {
+          id: string
+          course_id: string | null
+          collection_id: string | null
+          source: string
+          moodle_module_id: number | null
+          drive_file_id: string | null
+          name: string
+          kind: string
+          doc_role: string | null
+          mime_type: string | null
+          file_url: string | null
+          file_size: number | null
+          section_name: string | null
+          sort_order: number
+          ai_subject: string | null
+          ai_topics: string[]
+          ai_summary: string | null
+          ai_classified_at: string | null
+          last_synced_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          course_id?: string | null
+          collection_id?: string | null
+          source?: string
+          moodle_module_id?: number | null
+          drive_file_id?: string | null
+          name: string
+          kind?: string
+          doc_role?: string | null
+          mime_type?: string | null
+          file_url?: string | null
+          file_size?: number | null
+          section_name?: string | null
+          sort_order?: number
+          ai_subject?: string | null
+          ai_topics?: string[]
+          ai_summary?: string | null
+          ai_classified_at?: string | null
+          last_synced_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          course_id?: string | null
+          collection_id?: string | null
+          source?: string
+          moodle_module_id?: number | null
+          drive_file_id?: string | null
+          name?: string
+          kind?: string
+          doc_role?: string | null
+          mime_type?: string | null
+          file_url?: string | null
+          file_size?: number | null
+          section_name?: string | null
+          sort_order?: number
+          ai_subject?: string | null
+          ai_topics?: string[]
+          ai_summary?: string | null
+          ai_classified_at?: string | null
+          last_synced_at?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      resource_sync_runs: {
+        Row: {
+          id: string
+          started_at: string
+          finished_at: string | null
+          status: string
+          categories_seen: number
+          courses_seen: number
+          resources_seen: number
+          error_message: string | null
+        }
+        Insert: {
+          id?: string
+          started_at?: string
+          finished_at?: string | null
+          status?: string
+          categories_seen?: number
+          courses_seen?: number
+          resources_seen?: number
+          error_message?: string | null
+        }
+        Update: {
+          id?: string
+          started_at?: string
+          finished_at?: string | null
+          status?: string
+          categories_seen?: number
+          courses_seen?: number
+          resources_seen?: number
+          error_message?: string | null
+        }
+        Relationships: []
+      }
+      planner_folders: {
+        Row: {
+          id: string
+          teacher_id: string | null
+          parent_id: string | null
+          name: string
+          colour: string | null
+          is_ai_generated: boolean
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          teacher_id?: string | null
+          parent_id?: string | null
+          name: string
+          colour?: string | null
+          is_ai_generated?: boolean
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          teacher_id?: string | null
+          parent_id?: string | null
+          name?: string
+          colour?: string | null
+          is_ai_generated?: boolean
+          sort_order?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      planner_folder_items: {
+        Row: {
+          id: string
+          folder_id: string
+          resource_id: string
+          note: string | null
+          sort_order: number
+          added_at: string
+        }
+        Insert: {
+          id?: string
+          folder_id: string
+          resource_id: string
+          note?: string | null
+          sort_order?: number
+          added_at?: string
+        }
+        Update: {
+          id?: string
+          folder_id?: string
+          resource_id?: string
+          note?: string | null
+          sort_order?: number
+          added_at?: string
+        }
+        Relationships: []
+      }
+      lesson_plan_resources: {
+        Row: {
+          id: string
+          lesson_plan_id: string
+          resource_id: string
+          role: string
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          lesson_plan_id: string
+          resource_id: string
+          role?: string
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          lesson_plan_id?: string
+          resource_id?: string
+          role?: string
+          sort_order?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
       academic_calendar: {
         Row: {
           created_at: string

@@ -19,6 +19,13 @@ const NAV_SECTIONS = [
     ],
   },
   {
+    label: "Resources",
+    items: [
+      { href: "/resources", label: "Curriculum Catalogue" },
+      { href: "/resources/folders", label: "My Folders" },
+    ],
+  },
+  {
     label: "Records",
     items: [
       { href: "/roster", label: "Roster" },
