@@ -116,10 +116,10 @@ export async function evaluateRule(
 
       const matches = (data ?? []).map((row) => {
         const cls = one(row.classes);
-        const module = one(row.curriculum_modules);
+        const curriculumModule = one(row.curriculum_modules);
         return {
           summary: `${cls?.name ?? "A class"} is behind on "${
-            module?.title ?? "a module"
+            curriculumModule?.title ?? "a module"
           }" (planned ${row.planned_completion_date}).`,
           teacherId: cls?.teacher_id ?? null,
         };
