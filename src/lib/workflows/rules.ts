@@ -74,9 +74,34 @@ export async function evaluateRule(
             .lte("date", until),
         ]);
 
+      // Does the calendar actually reach the end of the window we are checking?
+      //
+      // Without this, a calendar that has simply run out returns zero school
+      // days, which returns zero gaps, which reads as "everything is planned".
+      // That is a false all-clear — the single worst failure mode for a
+      // monitoring rule. Fail loudly instead so the run is recorded as an error.
+      const { data: lastDay } = await supabase
+        .from("academic_calendar")
+        .select("date")
+        .order("date", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!lastDay?.date || lastDay.date < until) {
+        throw new Error(
+          `Academic calendar covers only through ${
+            lastDay?.date ?? "(no dates recorded)"
+          }, but this check looks ahead to ${until}. Extend the calendar — until it is extended this rule cannot distinguish "all planned" from "no data".`,
+        );
+      }
+
       const schoolDayCount = (schoolDays ?? []).length;
       if (schoolDayCount === 0) {
-        return { matches: [], note: "No school days in the window." };
+        // The calendar does reach this far, so this genuinely is a break.
+        return {
+          matches: [],
+          note: "No school days in the window (holiday or weekend).",
+        };
       }
 
       const planned = new Set(

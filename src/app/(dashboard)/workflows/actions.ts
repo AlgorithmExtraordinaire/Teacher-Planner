@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole, requireUser } from "@/lib/dal";
-import { evaluateRule } from "@/lib/workflows/rules";
-import { getRule, type RuleType } from "@/lib/workflows/definitions";
+import { executeWorkflow, type WorkflowRow } from "@/lib/workflows/run";
+import { getRule } from "@/lib/workflows/definitions";
 
 export type WorkflowState = { error?: string; ok?: string } | undefined;
 
@@ -62,8 +62,11 @@ export async function toggleWorkflow(formData: FormData) {
 }
 
 /**
- * Run one workflow now. Records a run, raises alerts for each match, and
- * stamps `last_run_at`.
+ * Run one workflow now, on the caller's own client so RLS still applies.
+ *
+ * Shares `executeWorkflow` with the scheduled runner in
+ * `/api/cron/workflows`, so a manual run and an automatic one behave
+ * identically and land in the same audit trail.
  */
 export async function runWorkflow(formData: FormData) {
   await requireUser();
@@ -72,64 +75,15 @@ export async function runWorkflow(formData: FormData) {
 
   const { data: workflow } = await supabase
     .from("workflows")
-    .select("*")
+    .select(
+      "id, name, rule_type, params, severity, recipient_role, cadence, is_enabled, last_run_at",
+    )
     .eq("id", id)
     .single();
 
   if (!workflow) return;
 
-  const { data: run } = await supabase
-    .from("workflow_runs")
-    .insert({ workflow_id: workflow.id, status: "running" })
-    .select("id")
-    .single();
-
-  try {
-    const { matches, note } = await evaluateRule(
-      supabase,
-      workflow.rule_type as RuleType,
-      (workflow.params ?? {}) as Record<string, unknown>,
-    );
-
-    let alertsCreated = 0;
-    if (matches.length > 0) {
-      const { error: alertError } = await supabase.from("system_alerts").insert(
-        matches.map((m) => ({
-          message: `[${workflow.name}] ${m.summary}`,
-          severity: workflow.severity,
-          recipient_role: workflow.recipient_role,
-          teacher_id: m.teacherId ?? null,
-        })),
-      );
-      if (!alertError) alertsCreated = matches.length;
-    }
-
-    await Promise.all([
-      supabase
-        .from("workflow_runs")
-        .update({
-          status: "success",
-          finished_at: new Date().toISOString(),
-          matches_found: matches.length,
-          alerts_created: alertsCreated,
-          summary: `${matches.length} match(es). ${note}`,
-        })
-        .eq("id", run?.id ?? ""),
-      supabase
-        .from("workflows")
-        .update({ last_run_at: new Date().toISOString() })
-        .eq("id", workflow.id),
-    ]);
-  } catch (e) {
-    await supabase
-      .from("workflow_runs")
-      .update({
-        status: "error",
-        finished_at: new Date().toISOString(),
-        error_message: e instanceof Error ? e.message : String(e),
-      })
-      .eq("id", run?.id ?? "");
-  }
+  await executeWorkflow(supabase, workflow as unknown as WorkflowRow, "manual");
 
   revalidatePath("/workflows");
   revalidatePath("/");

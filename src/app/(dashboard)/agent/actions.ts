@@ -77,13 +77,45 @@ export async function reviewAction(formData: FormData) {
   }
 
   // The payload is model-authored JSON, so its shape is only known at runtime;
-  // Postgres constraints and RLS are what actually validate it on insert.
-  const { data: inserted, error } = await supabase
-    .from(table)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .insert(proposal.payload as any)
-    .select("id")
-    .single();
+  // Postgres constraints and RLS are what actually validate it.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const payload = (proposal.payload ?? {}) as Record<string, any>;
+
+  // `update_pacing` updates an existing row — inserting would silently create a
+  // duplicate pacing record instead of moving the one the agent reasoned about.
+  const isUpdate = proposal.action_type === "update_pacing";
+
+  if (isUpdate && !payload.id) {
+    await supabase
+      .from("agent_actions")
+      .update({
+        status: "failed",
+        error_message:
+          "update_pacing requires an `id` in the payload identifying the pacing_monitor row to update.",
+        reviewed_by: reviewer.id,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+    revalidatePath("/agent/proposals");
+    return;
+  }
+
+  const { id: targetId, ...changes } = payload;
+
+  const { data: inserted, error } = isUpdate
+    ? await supabase
+        .from(table)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .update(changes as any)
+        .eq("id", targetId)
+        .select("id")
+        .single()
+    : await supabase
+        .from(table)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .insert(payload as any)
+        .select("id")
+        .single();
 
   await supabase
     .from("agent_actions")

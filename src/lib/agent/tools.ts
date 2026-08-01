@@ -36,6 +36,17 @@ const READABLE = [
   "duolingo_tracker",
   "language_platform_migration",
   "system_alerts",
+  // Curriculum catalogue. Without these the assistant is blind to the actual
+  // textbooks and teacher guides, which is most of what planning questions are
+  // really about. RLS still applies: `planner_folders` and their items are
+  // private to the owning teacher, so the agent sees only the caller's own.
+  "resource_categories",
+  "resource_courses",
+  "resource_collections",
+  "resources",
+  "planner_folders",
+  "planner_folder_items",
+  "lesson_plan_resources",
 ] as const;
 
 const MAX_ROWS = 100;

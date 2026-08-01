@@ -33,8 +33,12 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = path.startsWith("/login");
   const isPublicAsset =
     path.startsWith("/_next") || path.startsWith("/favicon");
+  // Machine-to-machine: called by the scheduler with a bearer secret, never by
+  // a browser session. Redirecting it to /login would turn every scheduled run
+  // into a silent 200 with a login page as the body.
+  const isCron = path.startsWith("/api/cron");
 
-  if (!user && !isAuthRoute && !isPublicAsset) {
+  if (!user && !isAuthRoute && !isPublicAsset && !isCron) {
     const redirectUrl = new URL("/login", request.url);
     redirectUrl.searchParams.set("next", path);
     return NextResponse.redirect(redirectUrl);

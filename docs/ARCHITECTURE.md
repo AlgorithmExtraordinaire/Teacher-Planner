@@ -125,6 +125,60 @@ defaulting to the `teacher` role.
 | `profiles` vs `teachers` overlap | Two identity tables; acceptable only if `teachers` must hold staff *without* logins |
 | No soft-delete or audit trail | Student records are hard-deleted; no history for a school system |
 
+## 4a. Scheduled workflow runner
+
+Workflows are evaluated by `src/lib/workflows/run.ts`, shared by two callers:
+
+| Caller | Client | Auth |
+|---|---|---|
+| "Run now" button (`runWorkflow` action) | caller's session | RLS, as the signed-in user |
+| `POST /api/cron/workflows` | service role | `Authorization: Bearer $CRON_SECRET` |
+
+The app holds **no in-process timer**. A Next.js server has nowhere durable to
+keep one across restarts, and a wedged `setInterval` fails silently — the exact
+failure mode this system is meant to catch. An external scheduler is
+observable and retryable instead:
+
+```
+n8n Schedule Trigger (or systemd timer)
+      │  POST + bearer secret, nightly
+      ▼
+/api/cron/workflows   ← exempt from the login redirect in lib/supabase/proxy.ts
+      │  selects is_enabled workflows where cadence has elapsed
+      ▼
+executeWorkflow() per workflow, sequentially
+      │
+      ├─► workflow_runs   (running → success | error)
+      ├─► system_alerts   (one row per match)
+      └─► workflows.last_run_at   (stamped on success only)
+```
+
+`?force=true` ignores cadence, for testing.
+
+**Design notes**
+
+- `last_run_at` is stamped **only on success**, so a failed run retries on the
+  next tick rather than waiting out a full cadence.
+- An unrecognised `cadence` never auto-runs — a schedule we cannot interpret
+  should wait for a human, not guess.
+- The response is HTTP **500 if any workflow failed**, so the scheduler can
+  alert on status code without parsing the body.
+- A failed `system_alerts` insert now fails the run. Previously it was
+  swallowed and reported as success — finding problems and telling nobody is
+  not a successful run.
+
+**Required env** (see `.env.example`): `CRON_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`.
+The service-role key bypasses RLS, so `lib/supabase/service.ts` is importable
+only from this route; everything reachable by a browser session keeps using
+`lib/supabase/server.ts`.
+
+### Calendar coverage guard
+
+`missing_lesson_plans` now throws if `academic_calendar` does not reach the end
+of its look-ahead window. Without that check an exhausted calendar returns zero
+school days → zero gaps → "everything is planned": a false all-clear, the worst
+possible failure for a monitoring rule. It fails loudly instead.
+
 ## 5. Deployment
 
 **Source of truth:** GitHub `AlgorithmExtraordinaire/Teacher-Planner`, branch `main`.
