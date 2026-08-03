@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { requireUser } from "@/lib/dal";
+import { requireUser, isStaffAdmin } from "@/lib/dal";
 import { PageHeader, Card, EmptyState } from "@/components/ui";
 import { Badge } from "@/components/cell";
 import { reviewAction } from "@/app/(dashboard)/agent/actions";
@@ -8,7 +8,7 @@ import { reviewAction } from "@/app/(dashboard)/agent/actions";
 export default async function ProposalsPage() {
   const user = await requireUser();
   const supabase = await createClient();
-  const canReview = user.role === "admin" || user.role === "grade_lead";
+  const canReview = isStaffAdmin(user);
 
   const { data: proposals } = await supabase
     .from("agent_actions")

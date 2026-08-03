@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { requireRole, requireUser } from "@/lib/dal";
+import { requireStaffAdmin, requireUser } from "@/lib/dal";
 
 export async function startConversation(formData: FormData) {
   const user = await requireUser();
@@ -26,7 +26,7 @@ export async function startConversation(formData: FormData) {
  * point where model-suggested data actually enters the school's records.
  */
 export async function reviewAction(formData: FormData) {
-  const reviewer = await requireRole("admin", "grade_lead");
+  const reviewer = await requireStaffAdmin();
   const supabase = await createClient();
 
   const id = String(formData.get("id") ?? "");

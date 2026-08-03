@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { requireUser } from "@/lib/dal";
+import { requireUser, isStaffAdmin } from "@/lib/dal";
 import { PageHeader, Card, EmptyState, StatTile } from "@/components/ui";
 import { Badge, formatCell } from "@/components/cell";
 import { WorkflowForm } from "@/app/(dashboard)/workflows/workflow-form";
@@ -9,7 +9,7 @@ import { getRule } from "@/lib/workflows/definitions";
 export default async function WorkflowsPage() {
   const user = await requireUser();
   const supabase = await createClient();
-  const canManage = user.role === "admin" || user.role === "grade_lead";
+  const canManage = isStaffAdmin(user);
 
   const [{ data: workflows }, { data: runs }] = await Promise.all([
     supabase.from("workflows").select("*").order("name"),

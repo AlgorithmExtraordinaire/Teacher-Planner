@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { requireRole, requireUser } from "@/lib/dal";
+import { requireStaffAdmin, requireUser } from "@/lib/dal";
 import { executeWorkflow, type WorkflowRow } from "@/lib/workflows/run";
 import { getRule } from "@/lib/workflows/definitions";
 
@@ -12,7 +12,7 @@ export async function createWorkflow(
   _prev: WorkflowState,
   formData: FormData,
 ): Promise<WorkflowState> {
-  const user = await requireRole("admin", "grade_lead");
+  const user = await requireStaffAdmin();
   const supabase = await createClient();
 
   const name = String(formData.get("name") ?? "").trim();
@@ -51,7 +51,7 @@ export async function createWorkflow(
 }
 
 export async function toggleWorkflow(formData: FormData) {
-  await requireRole("admin", "grade_lead");
+  await requireStaffAdmin();
   const supabase = await createClient();
 
   const id = String(formData.get("id") ?? "");

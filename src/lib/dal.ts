@@ -3,7 +3,7 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export type Role = "teacher" | "grade_lead" | "admin";
+export type Role = "teacher" | "grade_lead" | "admin" | "superadmin";
 
 export type Profile = {
   id: string;
@@ -12,6 +12,26 @@ export type Profile = {
   role: Role;
   grade_band: string | null;
 };
+
+/**
+ * Roles with staff-admin capability. Mirrors `public.is_staff_admin()` in the
+ * database — keep the two in step, and prefer these helpers to comparing role
+ * strings at call sites, so adding a role never silently locks someone out.
+ */
+export const STAFF_ADMIN_ROLES: readonly Role[] = [
+  "grade_lead",
+  "admin",
+  "superadmin",
+];
+
+export function isStaffAdmin(user: Profile): boolean {
+  return STAFF_ADMIN_ROLES.includes(user.role);
+}
+
+/** Platform-level control: roles, system settings, schools, audit log. */
+export function isSuperadmin(user: Profile): boolean {
+  return user.role === "superadmin";
+}
 
 export const getCurrentUser = cache(async (): Promise<Profile | null> => {
   const supabase = await createClient();
@@ -47,5 +67,19 @@ export const requireUser = cache(async (): Promise<Profile> => {
 export async function requireRole(...roles: Role[]): Promise<Profile> {
   const user = await requireUser();
   if (!roles.includes(user.role)) redirect("/");
+  return user;
+}
+
+/** Anything an admin or grade lead may do. Superadmin inherits all of it. */
+export async function requireStaffAdmin(): Promise<Profile> {
+  const user = await requireUser();
+  if (!isStaffAdmin(user)) redirect("/");
+  return user;
+}
+
+/** Superadmin only. RLS is still the real boundary; this is the UI gate. */
+export async function requireSuperadmin(): Promise<Profile> {
+  const user = await requireUser();
+  if (!isSuperadmin(user)) redirect("/");
   return user;
 }
