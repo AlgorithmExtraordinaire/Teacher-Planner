@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireStaffAdmin, requireUser } from "@/lib/dal";
+import { recordAudit } from "@/lib/audit";
 
 export async function startConversation(formData: FormData) {
   const user = await requireUser();
@@ -49,6 +50,15 @@ export async function reviewAction(formData: FormData) {
         reviewed_at: new Date().toISOString(),
       })
       .eq("id", id);
+
+    await recordAudit(supabase, {
+      actorId: reviewer.id,
+      action: "proposal.rejected",
+      entity: "agent_actions",
+      entityId: id,
+      detail: { action_type: proposal.action_type },
+    });
+
     revalidatePath("/agent/proposals");
     return;
   }
@@ -127,6 +137,21 @@ export async function reviewAction(formData: FormData) {
       reviewed_at: new Date().toISOString(),
     })
     .eq("id", id);
+
+  // Model-proposed data entering school records is exactly the event an
+  // audit trail exists for — record the outcome either way.
+  await recordAudit(supabase, {
+    actorId: reviewer.id,
+    action: error ? "proposal.apply_failed" : "proposal.applied",
+    entity: table,
+    entityId: inserted?.id ?? id,
+    detail: {
+      action_type: proposal.action_type,
+      proposal_id: id,
+      mode: isUpdate ? "update" : "insert",
+      error: error?.message ?? null,
+    },
+  });
 
   revalidatePath("/agent/proposals");
   revalidatePath("/");

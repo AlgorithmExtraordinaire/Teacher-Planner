@@ -1072,6 +1072,7 @@ export type Database = {
           grade_band: string | null
           id: string
           role: string
+          school_id: string | null
         }
         Insert: {
           created_at?: string
@@ -1079,6 +1080,7 @@ export type Database = {
           grade_band?: string | null
           id: string
           role: string
+          school_id?: string | null
         }
         Update: {
           created_at?: string
@@ -1086,8 +1088,114 @@ export type Database = {
           grade_band?: string | null
           id?: string
           role?: string
+          school_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_school_id_fkey"
+            columns: ["school_id"]
+            isOneToOne: false
+            referencedRelation: "schools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          detail: Json | null
+          entity: string | null
+          entity_id: string | null
+          id: number
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json | null
+          entity?: string | null
+          entity_id?: string | null
+          id?: number
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json | null
+          entity?: string | null
+          entity_id?: string | null
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schools: {
+        Row: {
+          code: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          timezone: string
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          timezone?: string
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          timezone?: string
         }
         Relationships: []
+      }
+      system_settings: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reflection_pd_log: {
         Row: {
@@ -1344,6 +1452,7 @@ export type Database = {
       current_role: { Args: never; Returns: string }
       current_teacher_id: { Args: never; Returns: string }
       is_staff_admin: { Args: never; Returns: boolean }
+      is_superadmin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

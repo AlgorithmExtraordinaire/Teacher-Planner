@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/dal";
+import { requireUser, isSuperadmin } from "@/lib/dal";
 import { logout } from "@/app/login/actions";
 
 const NAV_SECTIONS = [
@@ -38,12 +38,22 @@ const NAV_SECTIONS = [
   },
 ];
 
+// Superadmin only. Hiding it is a courtesy, not the control — RLS is what
+// stops anyone else reading settings, schools, or the audit log.
+const PLATFORM_SECTION = {
+  label: "Platform",
+  items: [{ href: "/admin/settings", label: "Settings & Audit" }],
+};
+
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const user = await requireUser();
+  const sections = isSuperadmin(user)
+    ? [...NAV_SECTIONS, PLATFORM_SECTION]
+    : NAV_SECTIONS;
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -55,7 +65,7 @@ export default async function DashboardLayout({
           <p className="text-xs text-slate-500">Swakopmund Christian Academy</p>
         </div>
         <nav className="flex flex-1 flex-col gap-6">
-          {NAV_SECTIONS.map((section) => (
+          {sections.map((section) => (
             <div key={section.label} className="flex flex-col gap-1">
               <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
                 {section.label}

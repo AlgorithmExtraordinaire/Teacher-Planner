@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireStaffAdmin, requireUser } from "@/lib/dal";
+import { recordAudit } from "@/lib/audit";
 import { executeWorkflow, type WorkflowRow } from "@/lib/workflows/run";
 import { getRule } from "@/lib/workflows/definitions";
 
@@ -51,13 +52,23 @@ export async function createWorkflow(
 }
 
 export async function toggleWorkflow(formData: FormData) {
-  await requireStaffAdmin();
+  const user = await requireStaffAdmin();
   const supabase = await createClient();
 
   const id = String(formData.get("id") ?? "");
   const enable = String(formData.get("enable") ?? "") === "true";
 
   await supabase.from("workflows").update({ is_enabled: enable }).eq("id", id);
+
+  // Enabling a workflow lets it write alerts unattended, so it is a
+  // governance event, not just a UI toggle.
+  await recordAudit(supabase, {
+    actorId: user.id,
+    action: enable ? "workflow.enabled" : "workflow.disabled",
+    entity: "workflows",
+    entityId: id,
+  });
+
   revalidatePath("/workflows");
 }
 
