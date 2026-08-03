@@ -86,7 +86,7 @@ export default async function FoldersPage() {
             <div className="flex items-center gap-2">
               <p className="text-sm font-medium text-slate-900">{f.name}</p>
               {f.is_ai_generated && <Badge value="ai suggested" />}
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-slate-500">
                 {contents.length} item{contents.length === 1 ? "" : "s"}
               </span>
             </div>
@@ -94,7 +94,7 @@ export default async function FoldersPage() {
               <input type="hidden" name="folder_id" value={f.id} />
               <button
                 type="submit"
-                className="text-xs font-medium text-slate-400 hover:text-red-600"
+                className="text-xs font-medium text-slate-500 hover:text-red-600"
               >
                 Delete
               </button>
@@ -102,7 +102,7 @@ export default async function FoldersPage() {
           </div>
 
           {contents.length === 0 ? (
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               Empty — add files from the{" "}
               <Link href="/resources" className="underline">
                 catalogue
@@ -117,7 +117,7 @@ export default async function FoldersPage() {
                     <p className="truncate text-sm text-slate-700">
                       {it.resources?.name ?? "(missing file)"}
                     </p>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-500">
                       {it.resources?.doc_role
                         ? `${it.resources.doc_role.replace(/_/g, " ")} · `
                         : ""}
@@ -138,7 +138,7 @@ export default async function FoldersPage() {
                     <input type="hidden" name="item_id" value={it.id} />
                     <button
                       type="submit"
-                      className="shrink-0 text-xs text-slate-400 hover:text-red-600"
+                      className="shrink-0 text-xs text-slate-500 hover:text-red-600"
                     >
                       Remove
                     </button>

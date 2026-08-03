@@ -75,7 +75,7 @@ export default async function WorkflowsPage() {
                       {rule?.label ?? w.rule_type}
                       {w.description ? ` · ${w.description}` : ""}
                     </p>
-                    <p className="mt-1 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-slate-500">
                       Last run:{" "}
                       {w.last_run_at
                         ? new Date(w.last_run_at).toLocaleString()

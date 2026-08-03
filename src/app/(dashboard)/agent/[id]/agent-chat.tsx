@@ -140,7 +140,7 @@ export function AgentChat({
               }
             >
               {turn.role === "assistant" && turn.tools && turn.tools.length > 0 && (
-                <p className="mb-2 text-xs text-slate-400">
+                <p className="mb-2 text-xs text-slate-500">
                   Consulted {turn.tools.length} data source
                   {turn.tools.length === 1 ? "" : "s"}
                 </p>
@@ -162,7 +162,7 @@ export function AgentChat({
 
         {busy && !activeTool && turns[turns.length - 1]?.role === "user" && (
           <div className="flex">
-            <div className="rounded-lg bg-slate-50 px-4 py-2.5 text-sm text-slate-400">
+            <div className="rounded-lg bg-slate-50 px-4 py-2.5 text-sm text-slate-500">
               <span className="animate-pulse">Thinking…</span>
             </div>
           </div>

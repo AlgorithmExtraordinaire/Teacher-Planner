@@ -55,7 +55,7 @@ export default async function ProposalsPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <Badge value={p.action_type} />
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-slate-500">
                       {new Date(p.created_at).toLocaleString()}
                     </span>
                   </div>
@@ -112,7 +112,7 @@ export default async function ProposalsPage() {
                 <span className="flex-1 truncate text-sm text-slate-600">
                   {p.error_message ?? p.rationale ?? ""}
                 </span>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-500">
                   {p.reviewed_at
                     ? new Date(p.reviewed_at).toLocaleDateString()
                     : ""}

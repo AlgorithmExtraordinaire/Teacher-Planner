@@ -46,7 +46,9 @@ export function Badge({ value }: { value: string }) {
 
 export function formatCell(value: unknown, kind: ColumnKind = "text") {
   if (value === null || value === undefined || value === "") {
-    return <span className="text-slate-300">—</span>;
+    // slate-300 on white is ~1.9:1 — effectively invisible. This dash means
+    // "no value recorded", which is information, so it has to be legible.
+    return <span className="text-slate-500">—</span>;
   }
 
   switch (kind) {

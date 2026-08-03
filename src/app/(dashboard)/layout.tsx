@@ -67,7 +67,7 @@ export default async function DashboardLayout({
         <nav className="flex flex-1 flex-col gap-6">
           {sections.map((section) => (
             <div key={section.label} className="flex flex-col gap-1">
-              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 {section.label}
               </p>
               {section.items.map((item) => (

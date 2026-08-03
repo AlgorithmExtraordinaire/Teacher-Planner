@@ -70,7 +70,7 @@ export default async function AgentPage() {
               <Card className="p-3 transition hover:border-slate-400">
                 <div className="flex items-center justify-between gap-4">
                   <p className="truncate text-sm text-slate-800">{c.title}</p>
-                  <span className="shrink-0 text-xs text-slate-400">
+                  <span className="shrink-0 text-xs text-slate-500">
                     {new Date(c.updated_at).toLocaleDateString()}
                   </span>
                 </div>

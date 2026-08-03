@@ -132,7 +132,7 @@ export function ResourcePicker({
                 />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm text-slate-800">{r.name}</p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     {r.section_name ? `${r.section_name} · ` : ""}
                     {mb(r.file_size)}
                   </p>

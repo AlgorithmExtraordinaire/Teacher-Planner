@@ -75,7 +75,7 @@ export default async function CommandCenterPage() {
             <div className="flex flex-col gap-2">
               {alerts.map((a, i) => (
                 <Card key={i} className="p-3">
-                  <p className="text-xs font-medium uppercase text-slate-400">
+                  <p className="text-xs font-medium uppercase text-slate-500">
                     {a.severity}
                   </p>
                   <p className="text-sm text-slate-700">{a.message}</p>
