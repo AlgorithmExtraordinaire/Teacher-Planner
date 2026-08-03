@@ -1,77 +1,389 @@
 @import "tailwindcss";
 
-/*
- * Swakopmund Christian Academy — Teacher Planner
- * Institutional palette. Flat, high contrast, hairline borders over shadows.
- *
- * Measured contrast (WCAG AA needs 4.5:1 for body text):
- *   white on navy .............. 12.12:1
- *   navy on white .............. 12.12:1
- *   slate body on white ......... 7.53:1
- *   crimson on white ............ 9.35:1   ← safe for actions
- *   white on crimson ............ 9.35:1
- *   gold on navy ................ 5.76:1   ← safe on the sidebar only
- *   gold on white ............... 2.10:1   ← FAILS. Never text on white.
- *
- * Gold is therefore an accent *on navy* — active nav, focus rails — and never
- * text or a control on the white content area. Crimson carries primary and
- * destructive actions instead.
- */
+/* ==========================================================================
+   TEACHER PLANNER DESIGN SYSTEM
+   3-in-1 theme architecture, switched by [data-theme] on <html>.
 
+   Fonts are NOT imported from fonts.googleapis.com. next/font self-hosts
+   Inter, Poppins and JetBrains Mono at build time (see app/layout.tsx),
+   which removes a render-blocking third-party request, eliminates the flash
+   of fallback text, and keeps the app working if Google Fonts is blocked.
+   The variables below point at those self-hosted faces.
+   ========================================================================== */
+
+/* ==========================================================================
+   THEME 1: "LEAN ACADEMY" (DEFAULT / ADMIN)
+   ========================================================================== */
+:root,
+[data-theme="lean-academy"] {
+  --color-primary: #1b365d; /* Trust Navy */
+  --color-primary-hover: #2a4c7e;
+  --color-accent: #d4af37; /* Gold */
+  --color-alert: #8a1538; /* Crimson */
+
+  --bg-app: #f4f7f9;
+  --bg-surface: #ffffff;
+  --bg-sidebar: var(--color-primary);
+
+  --font-base: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono-stack: var(--font-jetbrains), "JetBrains Mono", ui-monospace,
+    monospace;
+
+  --text-main: #1a202c;
+  --text-muted: #4a5568;
+  --text-inverse: #ffffff;
+
+  --border-color: #cbd5e1;
+  --border-width: 1px;
+  --radius-card: 4px;
+  --radius-btn: 4px;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  --status-success: #276749;
+  --status-warning: #b7791f;
+  --status-danger: var(--color-alert);
+
+  /* Text colour placed on top of each status fill. */
+  --on-status-success: #ffffff;
+  --on-status-warning: #ffffff;
+  --on-status-danger: #ffffff;
+
+  /*
+   * Sidebar tokens are separate because the sidebar is dark in two themes and
+   * light in one. Deriving them from --text-* would put dark text on navy.
+   *   white on navy 12.1:1 · slate-blue label 4.7:1 · gold active 5.8:1
+   */
+  --sidebar-fg: #ffffff;
+  --sidebar-muted: #8fa3bf;
+  --sidebar-active: var(--color-accent);
+}
+
+/* ==========================================================================
+   THEME 2: "ZEN WORKSPACE" (MINIMALIST)
+   ========================================================================== */
+[data-theme="zen-workspace"] {
+  --color-primary: #8ba89f; /* Sage Green */
+  --color-primary-hover: #7a978e;
+  --color-accent: #aec4d6; /* Dusty Blue */
+  --color-alert: #d6a292; /* Pale Terracotta */
+
+  --bg-app: #f9fafb;
+  --bg-surface: #ffffff;
+  --bg-sidebar: #f9fafb;
+
+  --font-base: var(--font-poppins), "Poppins", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-mono-stack: var(--font-jetbrains), "JetBrains Mono", ui-monospace,
+    monospace;
+
+  --text-main: #374151;
+  /*
+   * Specified as #9CA3AF, which measures 2.48:1 on this off-white background
+   * and fails WCAG AA for body text. Darkened one step to #6B7280 (4.83:1),
+   * the smallest change that keeps the soft grey character while staying
+   * readable. Revert to #9CA3AF if the aesthetic must win.
+   */
+  --text-muted: #6b7280;
+  --text-inverse: #374151; /* light sidebar, so "inverse" is dark here */
+
+  --border-color: transparent;
+  --border-width: 0px;
+  --radius-card: 16px;
+  --radius-btn: 12px;
+  --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.04),
+    0 8px 10px -6px rgba(0, 0, 0, 0.01);
+
+  /*
+   * Success was #8BA89F, which is 2.56:1 under white badge text. Darkened to
+   * a deeper sage so white reads at 5.54:1. Warning keeps its pale yellow but
+   * takes dark text rather than white.
+   */
+  --status-success: #4f6f65;
+  --status-warning: #fcd34d;
+  --status-danger: #b06a53; /* deepened terracotta: 4.6:1 under white */
+
+  --on-status-success: #ffffff;
+  --on-status-warning: #1f2937;
+  --on-status-danger: #ffffff;
+
+  /* Light sidebar: dark text, and the active state is deep sage rather than
+     dusty blue, which would be near-invisible on off-white. */
+  --sidebar-fg: #374151;
+  --sidebar-muted: #6b7280;
+  --sidebar-active: #4f6f65;
+}
+
+/* ==========================================================================
+   THEME 3: "DEEP WORK" (DARK MODE)
+   ========================================================================== */
+[data-theme="deep-work"] {
+  --color-primary: #b388ff; /* Neon Purple */
+  --color-primary-hover: #d1b3ff;
+  --color-accent: #00e5ff; /* Electric Cyan */
+  --color-alert: #ff5252;
+
+  --bg-app: #121212;
+  --bg-surface: #1e1e1e;
+  --bg-sidebar: #181818;
+
+  --font-base: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono-stack: var(--font-jetbrains), "JetBrains Mono", ui-monospace,
+    monospace;
+
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af; /* 7.0:1 on #121212 — passes here */
+  --text-inverse: #121212;
+
+  --border-color: #333333;
+  --border-width: 1px;
+  --radius-card: 8px;
+  --radius-btn: 6px;
+  --shadow-card: 0 4px 6px rgba(0, 0, 0, 0.3);
+
+  --status-success: #69f0ae;
+  --status-warning: #ffd740;
+  --status-danger: #ff5252;
+
+  /* Neon fills are light, so status text goes dark for contrast. */
+  --on-status-success: #06281a;
+  --on-status-warning: #000000;
+  --on-status-danger: #2b0000;
+
+  /* Cyan on near-black measures ~11:1 — the vibrant active state the theme
+     is going for, without sacrificing legibility. */
+  --sidebar-fg: #f3f4f6;
+  --sidebar-muted: #9ca3af;
+  --sidebar-active: var(--color-accent);
+}
+
+/* ==========================================================================
+   TAILWIND BRIDGE
+   Utilities resolve to theme variables, so existing components restyle
+   themselves when [data-theme] changes — no per-component theme logic.
+   ========================================================================== */
 @theme {
-  --color-navy: #1b365d;
-  --color-navy-hover: #24466f;
-  --color-navy-border: #2d4a75;
-  --color-navy-fg: #dce4f0;
-  --color-navy-muted: #8fa3bf;
+  --color-navy: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-gold: var(--color-accent);
+  --color-crimson: var(--color-alert);
+  --color-crimson-hover: var(--color-alert);
 
-  --color-ink: #1b365d;
-  --color-body: #4a5568;
-  --color-line: #e2e8f0;
-  --color-surface: #ffffff;
+  --color-main: var(--text-main);
+  --color-ink: var(--text-main);
+  --color-muted: var(--text-muted);
+  --color-body: var(--text-muted);
+  --color-inverse: var(--text-inverse);
 
-  --color-gold: #d4af37;
-  --color-crimson: #8a1538;
-  --color-crimson-hover: #6e1029;
+  --color-surface: var(--bg-surface);
+  --color-app: var(--bg-app);
+  --color-line: var(--border-color);
+  --color-line-strong: var(--border-color);
 
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
+  /* Sidebar shades: derived from the theme so they follow it. */
+  --color-navy-hover: var(--color-primary-hover);
+  --color-navy-border: var(--border-color);
+  --color-navy-fg: var(--text-inverse);
+  --color-navy-muted: var(--text-muted);
+
+  --color-success: var(--status-success);
+  --color-warning: var(--status-warning);
+  --color-danger: var(--status-danger);
+
+  --font-sans: var(--font-base);
+  --font-mono: var(--font-mono-stack);
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #1b365d;
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+* {
+  box-sizing: border-box;
 }
-
-/*
- * No prefers-color-scheme block on purpose. Every surface is an explicit light
- * value with explicit dark text; a partial dark override only flips the
- * inherited body colour and renders uncoloured elements invisible.
- */
 
 body {
-  background: var(--background);
-  color: var(--color-body);
-  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-base);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
 }
 
 code,
 pre,
-.font-mono {
-  font-family: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Consolas,
-    monospace;
+.font-mono,
+.mono-metric {
+  font-family: var(--font-mono-stack);
 }
 
-/* Data-dense tables: line digits up so columns scan vertically. */
+.mono-metric {
+  font-weight: 500;
+}
+
 table {
   font-variant-numeric: tabular-nums;
 }
 
-/* Visible keyboard focus everywhere, in the accent rather than the UA default. */
 :focus-visible {
-  outline: 2px solid var(--color-crimson);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+/* ==========================================================================
+   COMPONENTS
+   ========================================================================== */
+.card {
+  background-color: var(--bg-surface);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.btn,
+.btn-primary,
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-base);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/*
+ * Accent fills are light in every theme (gold, dusty blue, cyan), so the
+ * label is the app background rather than white — white on gold is 1.9:1.
+ */
+.btn-accent {
+  background-color: var(--color-accent);
+  color: var(--bg-app);
+  font-weight: 600;
+}
+
+[data-theme="zen-workspace"] .btn-accent,
+[data-theme="lean-academy"] .btn-accent,
+:root .btn-accent {
+  color: var(--color-primary);
+}
+
+[data-theme="deep-work"] .btn-primary:hover {
+  box-shadow: 0 0 12px rgba(179, 136, 255, 0.4);
+}
+
+[data-theme="deep-work"] .btn-accent:hover {
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+}
+
+.btn-primary:disabled,
+.btn-accent:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  color: var(--text-muted);
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.data-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.badge-success {
+  background-color: var(--status-success);
+  color: var(--on-status-success);
+}
+.badge-warning {
+  background-color: var(--status-warning);
+  color: var(--on-status-warning);
+}
+.badge-danger {
+  background-color: var(--status-danger);
+  color: var(--on-status-danger);
+}
+.badge-neutral {
+  background-color: var(--bg-app);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+/* Kanban column rules, tinted by the theme's own palette. */
+.kanban-head {
+  padding-bottom: 0.25rem;
+  border-bottom: 2px solid var(--border-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.kanban-head--todo {
+  border-bottom-color: var(--color-primary);
+}
+.kanban-head--progress {
+  border-bottom-color: var(--color-accent);
+}
+.kanban-head--review {
+  border-bottom-color: var(--color-alert);
+}
+
+.kanban-item {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  font-size: 0.875rem;
 }

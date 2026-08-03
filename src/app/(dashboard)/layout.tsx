@@ -1,12 +1,13 @@
 import { requireUser, isSuperadmin } from "@/lib/dal";
 import { logout } from "@/app/login/actions";
 import { NavLink } from "@/app/(dashboard)/nav-link";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 const NAV_SECTIONS = [
   {
     label: "Dashboards",
     items: [
-      { href: "/", label: "Command Center" },
+      { href: "/", label: "Dashboard Overview" },
       { href: "/lesson-plans/new", label: "Lesson Plan Generator" },
     ],
   },
@@ -56,58 +57,88 @@ export default async function DashboardLayout({
     : NAV_SECTIONS;
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <aside className="hidden w-64 shrink-0 flex-col bg-navy px-3 py-6 md:flex">
-        <div className="mb-8 px-3">
-          <p className="text-sm font-semibold tracking-tight text-white">
-            Teacher Planner
-          </p>
-          <p className="mt-0.5 text-xs text-navy-muted">
+    // App shell: sidebar fixed, workspace scrolls. Constrained here rather
+    // than on <body> so the login page can still scroll on a short viewport.
+    <div className="flex h-screen overflow-hidden">
+      <aside
+        className="hidden w-[260px] shrink-0 flex-col gap-8 overflow-y-auto px-6 py-8 md:flex"
+        style={{
+          backgroundColor: "var(--bg-sidebar)",
+          color: "var(--sidebar-fg)",
+          borderRight: "var(--border-width) solid var(--border-color)",
+        }}
+      >
+        <div>
+          <h2 className="text-base font-semibold leading-tight">
             Swakopmund Christian Academy
-          </p>
+          </h2>
+          <small
+            className="text-xs"
+            style={{ color: "var(--sidebar-active)" }}
+          >
+            Academic Officer Portal
+          </small>
         </div>
 
         <nav className="flex flex-1 flex-col gap-6">
           {sections.map((section) => (
-            <div key={section.label} className="flex flex-col gap-0.5">
-              <p className="px-4 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-navy-muted">
+            <div key={section.label}>
+              <p
+                className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em]"
+                style={{ color: "var(--sidebar-muted)" }}
+              >
                 {section.label}
               </p>
-              {section.items.map((item) => (
-                <NavLink key={item.href} href={item.href} label={item.label} />
-              ))}
+              <ul className="flex list-none flex-col gap-3">
+                {section.items.map((item) => (
+                  <li key={item.href}>
+                    <NavLink href={item.href} label={item.label} />
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </nav>
-
-        <div className="mt-6 border-t border-navy-border px-4 pt-4">
-          <p className="text-xs text-navy-muted">
-            {user.role === "superadmin" ? "Platform owner" : "Signed in"}
-          </p>
-        </div>
       </aside>
 
-      <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-line bg-white px-6 py-3.5">
+      <main
+        className="flex flex-1 flex-col overflow-y-auto"
+        style={{ backgroundColor: "var(--bg-app)" }}
+      >
+        <header
+          className="flex flex-wrap items-center justify-between gap-4 px-8 py-4"
+          style={{
+            backgroundColor: "var(--bg-surface)",
+            borderBottom: "1px solid var(--border-color)",
+          }}
+        >
           <div>
-            <p className="text-sm font-semibold text-ink">{user.full_name}</p>
-            <p className="text-xs capitalize text-body">
-              {user.role.replace("_", " ")}
+            <h1 className="text-xl font-semibold">
+              {user.role === "superadmin"
+                ? "Academic Officer Dashboard"
+                : "Teacher Planner"}
+            </h1>
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+              {user.full_name} ·{" "}
+              <span className="capitalize">
+                {user.role.replace("_", " ")}
+              </span>
               {user.grade_band ? ` · ${user.grade_band}` : ""}
             </p>
           </div>
-          <form action={logout}>
-            <button
-              type="submit"
-              className="rounded-sm border border-line px-3 py-1.5 text-sm font-medium text-body transition-colors hover:border-crimson hover:text-crimson"
-            >
-              Sign out
-            </button>
-          </form>
+
+          <div className="flex items-center gap-3">
+            <ThemeSwitcher />
+            <form action={logout}>
+              <button type="submit" className="btn-primary">
+                Sign out
+              </button>
+            </form>
+          </div>
         </header>
 
-        <main className="flex-1 bg-white px-6 py-8">{children}</main>
-      </div>
+        <div className="p-8">{children}</div>
+      </main>
     </div>
   );
 }

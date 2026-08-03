@@ -4,11 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 /**
- * Sidebar link with an active state.
+ * Sidebar link.
  *
- * The active marker is a gold rail on navy — 5.76:1, comfortably legible.
- * Gold is confined to this dark surface; on white it measures 2.10:1 and
- * would fail, so it never leaves the sidebar.
+ * Colours come from --sidebar-* rather than the general text tokens, because
+ * the sidebar is dark in two themes and light in one. Active state uses
+ * --sidebar-active, which each theme sets to something legible on its own
+ * sidebar: gold on navy, deep sage on off-white, cyan on near-black.
  */
 export function NavLink({ href, label }: { href: string; label: string }) {
   const pathname = usePathname();
@@ -18,19 +19,12 @@ export function NavLink({ href, label }: { href: string; label: string }) {
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={[
-        "relative rounded-sm py-2 pl-4 pr-2 text-sm transition-colors",
-        active
-          ? "bg-navy-hover font-semibold text-white"
-          : "font-medium text-navy-fg hover:bg-navy-hover hover:text-white",
-      ].join(" ")}
+      style={{
+        color: active ? "var(--sidebar-active)" : "var(--sidebar-fg)",
+        opacity: active ? 1 : 0.85,
+      }}
+      className="text-sm font-medium no-underline transition-opacity hover:opacity-100"
     >
-      {active && (
-        <span
-          aria-hidden="true"
-          className="absolute inset-y-1 left-0 w-[3px] rounded-full bg-gold"
-        />
-      )}
       {label}
     </Link>
   );

@@ -7,9 +7,9 @@ export function PageHeader({
 }) {
   return (
     <div className="mb-6">
-      <h1 className="text-xl font-semibold tracking-tight text-ink">{title}</h1>
+      <h1 className="text-xl font-semibold tracking-tight text-main">{title}</h1>
       {description && (
-        <p className="mt-1 max-w-3xl text-sm text-body">{description}</p>
+        <p className="mt-1 max-w-3xl text-sm text-muted">{description}</p>
       )}
     </div>
   );
@@ -22,18 +22,45 @@ export function Card({
   children: React.ReactNode;
   className?: string;
 }) {
-  // Flat: a hairline border rather than a shadow. Institutional, not app-store.
+  // `.card` is defined in globals.css so hand-written and Tailwind styles
+  // share one definition of what a surface looks like.
+  return <div className={`card ${className}`}>{children}</div>;
+}
+
+const KPI_TONES = {
+  navy: "text-navy",
+  crimson: "text-crimson",
+  gold: "text-gold",
+  main: "text-main",
+} as const;
+
+/**
+ * Metric tile: muted label, large figure in a tone that says whether it needs
+ * attention. Gold and crimson are reserved for figures that do.
+ */
+export function KpiCard({
+  label,
+  value,
+  tone = "navy",
+  note,
+}: {
+  label: string;
+  value: string | number;
+  tone?: keyof typeof KPI_TONES;
+  note?: string;
+}) {
   return (
-    <div className={`rounded-sm border border-line bg-white p-5 ${className}`}>
-      {children}
+    <div className="card">
+      <h3 className="text-sm text-muted">{label}</h3>
+      <p className={`mt-1 text-3xl font-bold tabular-nums ${KPI_TONES[tone]}`}>
+        {value}
+      </p>
+      {note && <p className="mt-1 text-xs text-muted">{note}</p>}
     </div>
   );
 }
 
-/**
- * Metric tile. The number is the content, so it carries the weight and the
- * navy; the label stays quiet above it.
- */
+/** Retained for pages that use the simpler tile. */
 export function StatTile({
   label,
   value,
@@ -41,21 +68,12 @@ export function StatTile({
   label: string;
   value: string | number;
 }) {
-  return (
-    <div className="rounded-sm border border-line bg-white px-5 py-4">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-body">
-        {label}
-      </p>
-      <p className="mt-1.5 text-2xl font-semibold tabular-nums text-ink">
-        {value}
-      </p>
-    </div>
-  );
+  return <KpiCard label={label} value={value} tone="navy" />;
 }
 
 export function EmptyState({ message }: { message: string }) {
   return (
-    <div className="rounded-sm border border-dashed border-line bg-white px-5 py-8 text-center text-sm text-body">
+    <div className="rounded-[var(--radius-sm)] border border-dashed border-line bg-white px-5 py-8 text-center text-sm text-muted">
       {message}
     </div>
   );
@@ -73,25 +91,28 @@ export function DataTable({
   }
 
   return (
-    <div className="overflow-x-auto rounded-sm border border-line bg-white">
-      <table className="w-full min-w-max text-left text-sm">
-        <thead className="border-b border-line bg-white">
+    <div className="overflow-x-auto rounded-[var(--radius-sm)] border border-line bg-white">
+      <table className="w-full min-w-max border-collapse text-left text-sm">
+        <thead>
           <tr>
             {columns.map((col) => (
               <th
                 key={col}
-                className="whitespace-nowrap px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-body"
+                className="whitespace-nowrap border-b border-line px-4 py-2 font-semibold text-muted"
               >
                 {col}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-line">
+        <tbody>
           {rows.map((row, i) => (
-            <tr key={i} className="hover:bg-[#f7f9fc]">
+            <tr key={i} className="hover:bg-surface">
               {row.map((cell, j) => (
-                <td key={j} className="px-4 py-2.5 text-body">
+                <td
+                  key={j}
+                  className="border-b border-line px-4 py-2 text-main"
+                >
                   {cell ?? "—"}
                 </td>
               ))}
