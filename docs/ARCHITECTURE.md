@@ -35,7 +35,7 @@ client carrying the caller's JWT so **RLS is always in force**.
 | UI | React 19, Tailwind CSS v4 | Local primitives in `src/components/ui.tsx` |
 | Language | TypeScript (strict) | DB types generated from live schema |
 | Auth | Supabase Auth (email + password) | Cookie sessions via `@supabase/ssr` |
-| Database | Supabase Postgres 17 | 19 tables, RLS on every one |
+| Database | Supabase Postgres 17 (**Pro**) | 32 tables, RLS on every one |
 | Container | Docker, multi-stage, `node:22-alpine` | Non-root `nextjs` user |
 | Proxy / TLS | host nginx + Let's Encrypt (certbot) | Auto-renewal via `certbot.timer` |
 | Host | DigitalOcean droplet, Ubuntu 24.04 | 2 vCPU / 3.8 GB, shared with `sca-api` |
@@ -82,7 +82,18 @@ component ergonomics, RLS is for security. Never rely on the first two alone.
 
 ## 4. Data model
 
-19 tables in `public`. Migrations live in `supabase/migrations/`.
+32 tables in `public`. Migrations live in `supabase/migrations/`, applied
+`0001` → `0008` in order.
+
+> **Current project:** `Teacher_Planner`, ref `tlwzddwradxdthwzqxqr`, region
+> `us-east-2`, in the Pro org `admin@elearning-swakopca.edu.na's Org`. This
+> replaced the earlier free-tier project (`nmuvtgefbswmufpineyp`) on 3 Aug 2026.
+>
+> **Provision a fresh project** by applying `0001`–`0008` in order, then
+> `supabase/seed/sca_kb_reference_data.sql`. `ALL_IN_ONE_new_project.sql` is a
+> generated concatenation of those migrations — regenerate it rather than
+> hand-editing, or it drifts. It previously predated `0005`/`0006` and silently
+> provisioned 24 tables instead of 32.
 
 **Identity**
 `profiles` (1:1 with `auth.users`, holds role) · `teachers` (staff directory,
