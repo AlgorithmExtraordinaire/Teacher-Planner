@@ -58,7 +58,7 @@ export function ResourcePicker({
 
   if (resources.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+      <div className="rounded-lg border border-dashed border-line bg-white p-8 text-center text-sm text-body">
         No files indexed here yet. The Drive crawler populates these as it runs.
       </div>
     );
@@ -69,7 +69,7 @@ export function ResourcePicker({
       {selected.size > 0 && (
         <form
           action={addToFolder}
-          className="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-slate-900 bg-slate-900 px-4 py-3 text-sm text-white"
+          className="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-navy bg-navy px-4 py-3 text-sm text-white"
         >
           {[...selected].map((id) => (
             <input key={id} type="hidden" name="resource_id" value={id} />
@@ -78,7 +78,7 @@ export function ResourcePicker({
             {selected.size} selected
           </span>
           {folders.length === 0 ? (
-            <span className="text-slate-300">
+            <span className="text-navy-fg">
               Create a folder first to file these.
             </span>
           ) : (
@@ -86,7 +86,7 @@ export function ResourcePicker({
               <select
                 name="folder_id"
                 required
-                className="rounded-md border border-slate-600 bg-slate-800 px-2 py-1.5 text-sm text-white"
+                className="rounded-md border border-navy-border bg-navy-hover px-2 py-1.5 text-sm text-white"
               >
                 {folders.map((f) => (
                   <option key={f.id} value={f.id}>
@@ -96,7 +96,7 @@ export function ResourcePicker({
               </select>
               <button
                 type="submit"
-                className="rounded-md bg-white px-3 py-1.5 text-sm font-medium text-slate-900 hover:bg-slate-100"
+                className="rounded-md bg-white px-3 py-1.5 text-sm font-medium text-ink hover:bg-[#f1f4f8]"
               >
                 Add to folder
               </button>
@@ -105,34 +105,34 @@ export function ResourcePicker({
           <button
             type="button"
             onClick={() => setSelected(new Set())}
-            className="ml-auto text-xs text-slate-300 hover:text-white"
+            className="ml-auto text-xs text-navy-fg hover:text-white"
           >
             Clear
           </button>
         </form>
       )}
 
-      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-        <ul className="divide-y divide-slate-100">
+      <div className="overflow-hidden rounded-lg border border-line bg-white shadow-sm">
+        <ul className="divide-y divide-line">
           {resources.map((r) => {
             const isOn = selected.has(r.id);
             return (
               <li
                 key={r.id}
                 className={`flex items-center gap-3 px-4 py-3 ${
-                  isOn ? "bg-slate-50" : "hover:bg-slate-50"
+                  isOn ? "bg-[#f7f9fc]" : "hover:bg-[#f7f9fc]"
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={isOn}
                   onChange={() => toggle(r.id)}
-                  className="h-4 w-4 shrink-0 rounded border-slate-300"
+                  className="h-4 w-4 shrink-0 rounded border-line"
                   aria-label={`Select ${r.name}`}
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm text-slate-800">{r.name}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="truncate text-sm text-body">{r.name}</p>
+                  <p className="text-xs text-body">
                     {r.section_name ? `${r.section_name} · ` : ""}
                     {mb(r.file_size)}
                   </p>
@@ -141,7 +141,7 @@ export function ResourcePicker({
                   <span
                     className={`hidden shrink-0 rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset sm:inline ${
                       ROLE_TONE[r.doc_role] ??
-                      "bg-slate-100 text-slate-700 ring-slate-500/20"
+                      "bg-[#f1f4f8] text-body ring-body/20"
                     }`}
                   >
                     {ROLE_LABEL[r.doc_role] ?? r.doc_role}
@@ -152,7 +152,7 @@ export function ResourcePicker({
                     href={r.file_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="shrink-0 text-xs font-medium text-slate-500 hover:text-slate-900"
+                    className="shrink-0 text-xs font-medium text-body hover:text-ink"
                   >
                     Open
                   </a>

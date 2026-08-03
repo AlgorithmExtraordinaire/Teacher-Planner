@@ -57,11 +57,11 @@ export default async function ConversationPage({
       <div className="mb-4 flex items-center justify-between">
         <Link
           href="/agent"
-          className="text-xs font-medium text-slate-500 hover:text-slate-900"
+          className="text-xs font-medium text-body hover:text-ink"
         >
           ← Conversations
         </Link>
-        <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
+        <span className="rounded-md bg-[#f1f4f8] px-2 py-1 text-xs font-medium text-body">
           {specialist.label}
         </span>
       </div>

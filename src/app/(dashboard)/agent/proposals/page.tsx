@@ -24,7 +24,7 @@ export default async function ProposalsPage() {
       <div className="mb-2">
         <Link
           href="/agent"
-          className="text-xs font-medium text-slate-500 hover:text-slate-900"
+          className="text-xs font-medium text-body hover:text-ink"
         >
           ← Assistant
         </Link>
@@ -36,13 +36,13 @@ export default async function ProposalsPage() {
       />
 
       {!canReview && (
-        <Card className="mb-6 border-slate-300 bg-slate-50 text-sm text-slate-600">
+        <Card className="mb-6 border-line bg-[#f7f9fc] text-sm text-body">
           You can see proposals, but only admins and grade leads can approve
           them.
         </Card>
       )}
 
-      <h2 className="mb-3 text-sm font-semibold text-slate-900">
+      <h2 className="mb-3 text-sm font-semibold text-ink">
         Awaiting review
       </h2>
       {pending.length === 0 ? (
@@ -55,14 +55,14 @@ export default async function ProposalsPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <Badge value={p.action_type} />
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-body">
                       {new Date(p.created_at).toLocaleString()}
                     </span>
                   </div>
                   {p.rationale && (
-                    <p className="mt-2 text-sm text-slate-700">{p.rationale}</p>
+                    <p className="mt-2 text-sm text-body">{p.rationale}</p>
                   )}
-                  <pre className="mt-2 overflow-x-auto rounded-md bg-slate-50 p-3 text-xs text-slate-600">
+                  <pre className="mt-2 overflow-x-auto rounded-md bg-[#f7f9fc] p-3 text-xs text-body">
                     {JSON.stringify(p.payload, null, 2)}
                   </pre>
                 </div>
@@ -84,7 +84,7 @@ export default async function ProposalsPage() {
                       <input type="hidden" name="decision" value="reject" />
                       <button
                         type="submit"
-                        className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
+                        className="rounded-md border border-line px-3 py-1.5 text-sm font-medium text-body hover:bg-[#f1f4f8]"
                       >
                         Reject
                       </button>
@@ -97,7 +97,7 @@ export default async function ProposalsPage() {
         </div>
       )}
 
-      <h2 className="mb-3 mt-10 text-sm font-semibold text-slate-900">
+      <h2 className="mb-3 mt-10 text-sm font-semibold text-ink">
         History
       </h2>
       {settled.length === 0 ? (
@@ -109,10 +109,10 @@ export default async function ProposalsPage() {
               <div className="flex flex-wrap items-center gap-3">
                 <Badge value={p.status} />
                 <Badge value={p.action_type} />
-                <span className="flex-1 truncate text-sm text-slate-600">
+                <span className="flex-1 truncate text-sm text-body">
                   {p.error_message ?? p.rationale ?? ""}
                 </span>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-body">
                   {p.reviewed_at
                     ? new Date(p.reviewed_at).toLocaleDateString()
                     : ""}

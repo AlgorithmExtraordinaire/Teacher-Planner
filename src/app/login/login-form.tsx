@@ -11,7 +11,7 @@ export function LoginForm({ next }: { next: string }) {
       <input type="hidden" name="next" value={next} />
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="email" className="text-sm font-medium text-slate-700">
+        <label htmlFor="email" className="text-sm font-medium text-body">
           Email
         </label>
         <input
@@ -20,14 +20,14 @@ export function LoginForm({ next }: { next: string }) {
           type="email"
           required
           autoComplete="email"
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+          className="rounded-md border border-line px-3 py-2 text-sm focus:border-crimson focus:outline-none"
         />
       </div>
 
       <div className="flex flex-col gap-1">
         <label
           htmlFor="password"
-          className="text-sm font-medium text-slate-700"
+          className="text-sm font-medium text-body"
         >
           Password
         </label>
@@ -37,7 +37,7 @@ export function LoginForm({ next }: { next: string }) {
           type="password"
           required
           autoComplete="current-password"
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+          className="rounded-md border border-line px-3 py-2 text-sm focus:border-crimson focus:outline-none"
         />
       </div>
 
@@ -46,7 +46,7 @@ export function LoginForm({ next }: { next: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:opacity-60"
+        className="rounded-md bg-crimson px-3 py-2 text-sm font-medium text-white transition hover:bg-crimson-hover disabled:opacity-60"
       >
         {pending ? "Signing in…" : "Sign in"}
       </button>

@@ -66,7 +66,7 @@ export default async function ResourcesPage({
         />
         <Link
           href="/resources/folders"
-          className="h-fit rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+          className="h-fit rounded-md border border-line px-3 py-2 text-sm font-medium text-body hover:bg-[#f1f4f8]"
         >
           My folders
         </Link>
@@ -74,11 +74,11 @@ export default async function ResourcesPage({
 
       <form className="mb-6 flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-500">Subject</label>
+          <label className="text-xs font-medium text-body">Subject</label>
           <select
             name="subject"
             defaultValue={subject ?? ""}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="rounded-md border border-line px-3 py-2 text-sm"
           >
             <option value="">All subjects</option>
             {subjects.map((s) => (
@@ -89,11 +89,11 @@ export default async function ResourcesPage({
           </select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-500">Grade</label>
+          <label className="text-xs font-medium text-body">Grade</label>
           <select
             name="grade"
             defaultValue={grade ?? ""}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="rounded-md border border-line px-3 py-2 text-sm"
           >
             <option value="">All grades</option>
             {grades.map((g) => (
@@ -104,24 +104,24 @@ export default async function ResourcesPage({
           </select>
         </div>
         <div className="flex flex-1 flex-col gap-1">
-          <label className="text-xs font-medium text-slate-500">Search</label>
+          <label className="text-xs font-medium text-body">Search</label>
           <input
             name="q"
             defaultValue={q ?? ""}
             placeholder="Filename or topic…"
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+            className="rounded-md border border-line px-3 py-2 text-sm"
           />
         </div>
         <button
           type="submit"
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          className="rounded-md bg-crimson px-4 py-2 text-sm font-medium text-white hover:bg-crimson-hover"
         >
           Filter
         </button>
         {(subject || grade || q) && (
           <Link
             href="/resources"
-            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+            className="rounded-md border border-line px-4 py-2 text-sm font-medium text-body hover:bg-[#f1f4f8]"
           >
             Reset
           </Link>
@@ -135,7 +135,7 @@ export default async function ResourcesPage({
         </Card>
       )}
 
-      <p className="mb-3 text-sm text-slate-500">
+      <p className="mb-3 text-sm text-body">
         {resources.length} file{resources.length === 1 ? "" : "s"} across{" "}
         {matching.length} collection{matching.length === 1 ? "" : "s"}
       </p>

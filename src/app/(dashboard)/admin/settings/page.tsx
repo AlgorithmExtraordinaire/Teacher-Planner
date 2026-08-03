@@ -46,7 +46,7 @@ export default async function PlatformSettingsPage() {
       </div>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-slate-900">
+        <h2 className="mb-3 text-sm font-semibold text-ink">
           System settings
         </h2>
         <Card>
@@ -63,43 +63,43 @@ export default async function PlatformSettingsPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-500">No settings defined.</p>
+            <p className="text-sm text-body">No settings defined.</p>
           )}
         </Card>
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-xs text-body">
           Values are JSON. Quote text, write numbers and booleans bare.
         </p>
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-slate-900">Schools</h2>
+        <h2 className="mb-3 text-sm font-semibold text-ink">Schools</h2>
         {schools && schools.length > 0 ? (
           <Card className="p-0">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-slate-200 bg-slate-50">
+              <thead className="border-b border-line bg-[#f7f9fc]">
                 <tr>
-                  <th className="px-4 py-2.5 font-medium text-slate-600">
+                  <th className="px-4 py-2.5 font-medium text-body">
                     Name
                   </th>
-                  <th className="px-4 py-2.5 font-medium text-slate-600">
+                  <th className="px-4 py-2.5 font-medium text-body">
                     Code
                   </th>
-                  <th className="px-4 py-2.5 font-medium text-slate-600">
+                  <th className="px-4 py-2.5 font-medium text-body">
                     Timezone
                   </th>
-                  <th className="px-4 py-2.5 font-medium text-slate-600">
+                  <th className="px-4 py-2.5 font-medium text-body">
                     Status
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-line">
                 {schools.map((s) => (
                   <tr key={s.id}>
-                    <td className="px-4 py-2.5 text-slate-900">{s.name}</td>
-                    <td className="px-4 py-2.5 text-slate-700">
+                    <td className="px-4 py-2.5 text-ink">{s.name}</td>
+                    <td className="px-4 py-2.5 text-body">
                       {s.code ?? "—"}
                     </td>
-                    <td className="px-4 py-2.5 text-slate-700">{s.timezone}</td>
+                    <td className="px-4 py-2.5 text-body">{s.timezone}</td>
                     <td className="px-4 py-2.5">
                       <Badge value={s.is_active ? "active" : "inactive"} />
                     </td>
@@ -111,7 +111,7 @@ export default async function PlatformSettingsPage() {
         ) : (
           <EmptyState message="No schools registered." />
         )}
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-xs text-body">
           Registry only. Tenant isolation is not implemented — every school
           here would share one pool of records until{" "}
           <code className="font-mono">school_id</code> is enforced across all
@@ -120,46 +120,46 @@ export default async function PlatformSettingsPage() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-slate-900">
+        <h2 className="mb-3 text-sm font-semibold text-ink">
           Audit log — 25 most recent
         </h2>
         {audit && audit.length > 0 ? (
           <Card className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full min-w-max text-left text-sm">
-                <thead className="border-b border-slate-200 bg-slate-50">
+                <thead className="border-b border-line bg-[#f7f9fc]">
                   <tr>
-                    <th className="px-4 py-2.5 font-medium text-slate-600">
+                    <th className="px-4 py-2.5 font-medium text-body">
                       When
                     </th>
-                    <th className="px-4 py-2.5 font-medium text-slate-600">
+                    <th className="px-4 py-2.5 font-medium text-body">
                       Actor
                     </th>
-                    <th className="px-4 py-2.5 font-medium text-slate-600">
+                    <th className="px-4 py-2.5 font-medium text-body">
                       Action
                     </th>
-                    <th className="px-4 py-2.5 font-medium text-slate-600">
+                    <th className="px-4 py-2.5 font-medium text-body">
                       Entity
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-line">
                   {audit.map((row) => {
                     const actor = Array.isArray(row.profiles)
                       ? row.profiles[0]
                       : row.profiles;
                     return (
                       <tr key={row.id}>
-                        <td className="px-4 py-2.5 text-slate-500">
+                        <td className="px-4 py-2.5 text-body">
                           {new Date(row.created_at).toLocaleString()}
                         </td>
-                        <td className="px-4 py-2.5 text-slate-700">
+                        <td className="px-4 py-2.5 text-body">
                           {actor?.full_name ?? "system"}
                         </td>
                         <td className="px-4 py-2.5">
                           <Badge value={row.action} />
                         </td>
-                        <td className="px-4 py-2.5 font-mono text-xs text-slate-500">
+                        <td className="px-4 py-2.5 font-mono text-xs text-body">
                           {row.entity ?? "—"}
                           {row.entity_id ? `:${row.entity_id.slice(0, 8)}` : ""}
                         </td>
@@ -173,7 +173,7 @@ export default async function PlatformSettingsPage() {
         ) : (
           <EmptyState message="Nothing recorded yet. Entries appear when a proposal is reviewed, a workflow is toggled, or a setting changes." />
         )}
-        <p className="mt-2 text-xs text-slate-500">
+        <p className="mt-2 text-xs text-body">
           Append-only: no update or delete policy exists, so entries cannot be
           altered or removed through the API by any role.
         </p>

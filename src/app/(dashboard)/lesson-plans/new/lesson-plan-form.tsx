@@ -16,14 +16,14 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-sm font-medium text-slate-700">{label}</label>
+      <label className="text-sm font-medium text-body">{label}</label>
       {children}
     </div>
   );
 }
 
 const inputClass =
-  "rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none";
+  "rounded-md border border-line px-3 py-2 text-sm focus:border-crimson focus:outline-none";
 
 export function LessonPlanForm({ classes }: { classes: ClassOption[] }) {
   const [state, action, pending] = useActionState(createLessonPlan, undefined);
@@ -102,7 +102,7 @@ export function LessonPlanForm({ classes }: { classes: ClassOption[] }) {
       <button
         type="submit"
         disabled={pending}
-        className="w-fit rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+        className="w-fit rounded-md bg-crimson px-4 py-2 text-sm font-medium text-white hover:bg-crimson-hover disabled:opacity-60"
       >
         {pending ? "Saving…" : "Save lesson plan"}
       </button>

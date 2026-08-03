@@ -5,7 +5,7 @@ import { createWorkflow } from "@/app/(dashboard)/workflows/actions";
 import { RULES } from "@/lib/workflows/definitions";
 
 const input =
-  "rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none";
+  "rounded-md border border-line px-3 py-2 text-sm focus:border-crimson focus:outline-none";
 
 export function WorkflowForm() {
   const [state, action, pending] = useActionState(createWorkflow, undefined);
@@ -18,7 +18,7 @@ export function WorkflowForm() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+        className="rounded-md bg-crimson px-4 py-2 text-sm font-medium text-white hover:bg-crimson-hover"
       >
         + New workflow
       </button>
@@ -28,15 +28,15 @@ export function WorkflowForm() {
   return (
     <form
       action={action}
-      className="flex max-w-2xl flex-col gap-4 rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
+      className="flex max-w-2xl flex-col gap-4 rounded-lg border border-line bg-white p-5 shadow-sm"
     >
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-slate-700">Name</label>
+        <label className="text-sm font-medium text-body">Name</label>
         <input name="name" required className={input} />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-slate-700">Rule</label>
+        <label className="text-sm font-medium text-body">Rule</label>
         <select
           name="rule_type"
           value={ruleType}
@@ -49,14 +49,14 @@ export function WorkflowForm() {
             </option>
           ))}
         </select>
-        <p className="text-xs text-slate-500">{rule.description}</p>
+        <p className="text-xs text-body">{rule.description}</p>
       </div>
 
       {rule.params.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 rounded-md bg-slate-50 p-3">
+        <div className="grid grid-cols-2 gap-4 rounded-md bg-[#f7f9fc] p-3">
           {rule.params.map((p) => (
             <div key={p.key} className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-slate-700">
+              <label className="text-sm font-medium text-body">
                 {p.label}
               </label>
               <input
@@ -65,7 +65,7 @@ export function WorkflowForm() {
                 defaultValue={p.default}
                 className={input}
               />
-              {p.help && <p className="text-xs text-slate-500">{p.help}</p>}
+              {p.help && <p className="text-xs text-body">{p.help}</p>}
             </div>
           ))}
         </div>
@@ -73,7 +73,7 @@ export function WorkflowForm() {
 
       <div className="grid grid-cols-3 gap-4">
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-slate-700">Cadence</label>
+          <label className="text-sm font-medium text-body">Cadence</label>
           <select name="cadence" defaultValue="daily" className={input}>
             <option value="hourly">Hourly</option>
             <option value="daily">Daily</option>
@@ -81,7 +81,7 @@ export function WorkflowForm() {
           </select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-slate-700">Severity</label>
+          <label className="text-sm font-medium text-body">Severity</label>
           <select name="severity" defaultValue="info" className={input}>
             <option value="info">Info</option>
             <option value="warning">Warning</option>
@@ -89,7 +89,7 @@ export function WorkflowForm() {
           </select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium text-slate-700">
+          <label className="text-sm font-medium text-body">
             Notify role
           </label>
           <select name="recipient_role" defaultValue="" className={input}>
@@ -102,7 +102,7 @@ export function WorkflowForm() {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-slate-700">
+        <label className="text-sm font-medium text-body">
           Description
         </label>
         <textarea name="description" rows={2} className={input} />
@@ -115,14 +115,14 @@ export function WorkflowForm() {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+          className="rounded-md bg-crimson px-4 py-2 text-sm font-medium text-white hover:bg-crimson-hover disabled:opacity-60"
         >
           {pending ? "Creating…" : "Create workflow"}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+          className="rounded-md border border-line px-4 py-2 text-sm font-medium text-body hover:bg-[#f1f4f8]"
         >
           Cancel
         </button>

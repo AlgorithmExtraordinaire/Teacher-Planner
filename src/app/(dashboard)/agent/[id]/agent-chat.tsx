@@ -115,13 +115,13 @@ export function AgentChat({
 
   return (
     <div className="flex h-[calc(100vh-13rem)] flex-col">
-      <div className="flex-1 space-y-4 overflow-y-auto rounded-lg border border-slate-200 bg-white p-5">
+      <div className="flex-1 space-y-4 overflow-y-auto rounded-lg border border-line bg-white p-5">
         {turns.length === 0 && (
           <div className="py-12 text-center">
-            <p className="text-sm font-medium text-slate-900">
+            <p className="text-sm font-medium text-ink">
               {specialistLabel} specialist
             </p>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-body">
               Ask about your classes, pacing, assessment data, or lesson design.
             </p>
           </div>
@@ -135,12 +135,12 @@ export function AgentChat({
             <div
               className={
                 turn.role === "user"
-                  ? "max-w-[80%] rounded-lg bg-slate-900 px-4 py-2.5 text-sm text-white"
-                  : "max-w-[85%] rounded-lg bg-slate-50 px-4 py-2.5 text-sm text-slate-800"
+                  ? "max-w-[80%] rounded-lg bg-navy px-4 py-2.5 text-sm text-white"
+                  : "max-w-[85%] rounded-lg bg-[#f7f9fc] px-4 py-2.5 text-sm text-body"
               }
             >
               {turn.role === "assistant" && turn.tools && turn.tools.length > 0 && (
-                <p className="mb-2 text-xs text-slate-500">
+                <p className="mb-2 text-xs text-body">
                   Consulted {turn.tools.length} data source
                   {turn.tools.length === 1 ? "" : "s"}
                 </p>
@@ -154,7 +154,7 @@ export function AgentChat({
 
         {activeTool && (
           <div className="flex">
-            <div className="rounded-lg bg-slate-50 px-4 py-2.5 text-sm text-slate-500">
+            <div className="rounded-lg bg-[#f7f9fc] px-4 py-2.5 text-sm text-body">
               <span className="inline-block animate-pulse">{activeTool}…</span>
             </div>
           </div>
@@ -162,7 +162,7 @@ export function AgentChat({
 
         {busy && !activeTool && turns[turns.length - 1]?.role === "user" && (
           <div className="flex">
-            <div className="rounded-lg bg-slate-50 px-4 py-2.5 text-sm text-slate-500">
+            <div className="rounded-lg bg-[#f7f9fc] px-4 py-2.5 text-sm text-body">
               <span className="animate-pulse">Thinking…</span>
             </div>
           </div>
@@ -189,12 +189,12 @@ export function AgentChat({
           }}
           rows={2}
           placeholder="Ask about your classes, pacing, or lesson design…"
-          className="flex-1 resize-none rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+          className="flex-1 resize-none rounded-md border border-line px-3 py-2 text-sm focus:border-crimson focus:outline-none"
         />
         <button
           onClick={send}
           disabled={busy || !input.trim()}
-          className="h-fit self-end rounded-md bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+          className="h-fit self-end rounded-md bg-crimson px-4 py-2.5 text-sm font-medium text-white hover:bg-crimson-hover disabled:opacity-50"
         >
           Send
         </button>

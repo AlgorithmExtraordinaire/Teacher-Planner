@@ -28,22 +28,22 @@ export default async function TablesIndexPage() {
       <div className="flex flex-col gap-8">
         {tablesByGroup().map(({ group, tables }) => (
           <section key={group}>
-            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-body">
               {group}
             </h2>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {tables.map((t) => (
                 <Link key={t.name} href={`/tables/${t.name}`}>
-                  <Card className="h-full transition hover:border-slate-400 hover:shadow">
+                  <Card className="h-full transition hover:border-navy">
                     <div className="flex items-start justify-between gap-3">
-                      <p className="text-sm font-medium text-slate-900">
+                      <p className="text-sm font-medium text-ink">
                         {t.label}
                       </p>
-                      <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium tabular-nums text-slate-600">
+                      <span className="shrink-0 rounded-md bg-[#f1f4f8] px-2 py-0.5 text-xs font-medium tabular-nums text-body">
                         {countMap.get(t.name)}
                       </span>
                     </div>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-body">
                       {t.description}
                     </p>
                   </Card>

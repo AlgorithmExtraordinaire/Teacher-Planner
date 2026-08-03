@@ -18,26 +18,30 @@ const BADGE_TONES: Record<string, string> = {
   behind: "bg-amber-50 text-amber-700 ring-amber-600/20",
   in_review: "bg-amber-50 text-amber-700 ring-amber-600/20",
 
-  error: "bg-red-50 text-red-700 ring-red-600/20",
-  failed: "bg-red-50 text-red-700 ring-red-600/20",
-  rejected: "bg-red-50 text-red-700 ring-red-600/20",
-  urgent: "bg-red-50 text-red-700 ring-red-600/20",
-  inactive: "bg-slate-100 text-slate-600 ring-slate-500/20",
-  open: "bg-blue-50 text-blue-700 ring-blue-600/20",
-  info: "bg-blue-50 text-blue-700 ring-blue-600/20",
-  submitted: "bg-blue-50 text-blue-700 ring-blue-600/20",
+  // Failure states use the brand crimson rather than a generic red, so the
+  // one alarming colour in the product is the same everywhere.
+  error: "bg-[#f6e7ec] text-crimson ring-crimson/25",
+  failed: "bg-[#f6e7ec] text-crimson ring-crimson/25",
+  rejected: "bg-[#f6e7ec] text-crimson ring-crimson/25",
+  urgent: "bg-[#f6e7ec] text-crimson ring-crimson/25",
+
+  open: "bg-[#eaf0f8] text-navy ring-navy/20",
+  info: "bg-[#eaf0f8] text-navy ring-navy/20",
+  submitted: "bg-[#eaf0f8] text-navy ring-navy/20",
+  school_day: "bg-[#eaf0f8] text-navy ring-navy/20",
+
   holiday: "bg-violet-50 text-violet-700 ring-violet-600/20",
-  weekend: "bg-slate-100 text-slate-600 ring-slate-500/20",
-  school_day: "bg-blue-50 text-blue-700 ring-blue-600/20",
+  inactive: "bg-[#f1f4f8] text-body ring-body/20",
+  weekend: "bg-[#f1f4f8] text-body ring-body/20",
 };
 
-const DEFAULT_TONE = "bg-slate-100 text-slate-700 ring-slate-500/20";
+const DEFAULT_TONE = "bg-[#f1f4f8] text-body ring-body/20";
 
 export function Badge({ value }: { value: string }) {
   const tone = BADGE_TONES[value.toLowerCase()] ?? DEFAULT_TONE;
   return (
     <span
-      className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium capitalize ring-1 ring-inset ${tone}`}
+      className={`inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-medium capitalize ring-1 ring-inset ${tone}`}
     >
       {value.replace(/_/g, " ")}
     </span>
@@ -46,9 +50,9 @@ export function Badge({ value }: { value: string }) {
 
 export function formatCell(value: unknown, kind: ColumnKind = "text") {
   if (value === null || value === undefined || value === "") {
-    // slate-300 on white is ~1.9:1 — effectively invisible. This dash means
-    // "no value recorded", which is information, so it has to be legible.
-    return <span className="text-slate-500">—</span>;
+    // This dash means "no value recorded", which is information, so it uses
+    // the body colour (7.53:1) rather than a near-invisible tint.
+    return <span className="text-body">—</span>;
   }
 
   switch (kind) {

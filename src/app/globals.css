@@ -1,37 +1,58 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Swakopmund Christian Academy — Teacher Planner
+ * Institutional palette. Flat, high contrast, hairline borders over shadows.
+ *
+ * Measured contrast (WCAG AA needs 4.5:1 for body text):
+ *   white on navy .............. 12.12:1
+ *   navy on white .............. 12.12:1
+ *   slate body on white ......... 7.53:1
+ *   crimson on white ............ 9.35:1   ← safe for actions
+ *   white on crimson ............ 9.35:1
+ *   gold on navy ................ 5.76:1   ← safe on the sidebar only
+ *   gold on white ............... 2.10:1   ← FAILS. Never text on white.
+ *
+ * Gold is therefore an accent *on navy* — active nav, focus rails — and never
+ * text or a control on the white content area. Crimson carries primary and
+ * destructive actions instead.
+ */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+@theme {
+  --color-navy: #1b365d;
+  --color-navy-hover: #24466f;
+  --color-navy-border: #2d4a75;
+  --color-navy-fg: #dce4f0;
+  --color-navy-muted: #8fa3bf;
+
+  --color-ink: #1b365d;
+  --color-body: #4a5568;
+  --color-line: #e2e8f0;
+  --color-surface: #ffffff;
+
+  --color-gold: #d4af37;
+  --color-crimson: #8a1538;
+  --color-crimson-hover: #6e1029;
+
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 }
 
+:root {
+  --background: #ffffff;
+  --foreground: #1b365d;
+}
+
 /*
- * No dark-mode block on purpose.
- *
- * Every surface in this app is an explicit light value (bg-white, bg-slate-50)
- * with explicit dark text. A prefers-color-scheme override only flipped the
- * *inherited* body colour, so any element that did not set its own colour
- * rendered near-white text on a white card — invisible. Committing to one
- * legible theme is honest; a half-applied dark theme is a bug.
+ * No prefers-color-scheme block on purpose. Every surface is an explicit light
+ * value with explicit dark text; a partial dark override only flips the
+ * inherited body colour and renders uncoloured elements invisible.
  */
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  /*
-   * Geist is loaded by next/font in the root layout and exposed as
-   * --font-geist-sans. This previously read `Arial, Helvetica, sans-serif`,
-   * which overrode it: the font was downloaded on every page load and then
-   * never rendered. The stack below falls back gracefully if Geist fails.
-   */
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+  color: var(--color-body);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -42,4 +63,15 @@ pre,
 .font-mono {
   font-family: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Consolas,
     monospace;
+}
+
+/* Data-dense tables: line digits up so columns scan vertically. */
+table {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visible keyboard focus everywhere, in the accent rather than the UA default. */
+:focus-visible {
+  outline: 2px solid var(--color-crimson);
+  outline-offset: 2px;
 }

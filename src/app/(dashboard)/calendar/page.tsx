@@ -43,7 +43,7 @@ export default async function CalendarPage() {
         <StatTile label="Holidays" value={holidays ?? 0} />
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold text-slate-900">
+      <h2 className="mb-3 text-sm font-semibold text-ink">
         Upcoming dates
       </h2>
       <DataTable

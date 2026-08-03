@@ -53,7 +53,7 @@ export default async function CommandCenterPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <h2 className="mb-3 text-sm font-semibold text-slate-900">
+          <h2 className="mb-3 text-sm font-semibold text-ink">
             Today&apos;s lessons
           </h2>
           <DataTable
@@ -68,22 +68,22 @@ export default async function CommandCenterPage() {
         </div>
 
         <div>
-          <h2 className="mb-3 text-sm font-semibold text-slate-900">
+          <h2 className="mb-3 text-sm font-semibold text-ink">
             Alerts
           </h2>
           {alerts && alerts.length > 0 ? (
             <div className="flex flex-col gap-2">
               {alerts.map((a, i) => (
                 <Card key={i} className="p-3">
-                  <p className="text-xs font-medium uppercase text-slate-500">
+                  <p className="text-xs font-medium uppercase text-body">
                     {a.severity}
                   </p>
-                  <p className="text-sm text-slate-700">{a.message}</p>
+                  <p className="text-sm text-body">{a.message}</p>
                 </Card>
               ))}
             </div>
           ) : (
-            <Card className="text-sm text-slate-500">No open alerts.</Card>
+            <Card className="text-sm text-body">No open alerts.</Card>
           )}
         </div>
       </div>

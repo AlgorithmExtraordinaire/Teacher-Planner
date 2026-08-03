@@ -41,7 +41,7 @@ export default async function AgentPage() {
         )}
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold text-slate-900">
+      <h2 className="mb-3 text-sm font-semibold text-ink">
         Start a conversation
       </h2>
       <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -49,16 +49,16 @@ export default async function AgentPage() {
           <form key={s.id} action={startConversation}>
             <input type="hidden" name="specialist" value={s.id} />
             <button type="submit" className="w-full text-left">
-              <Card className="h-full transition hover:border-slate-400 hover:shadow">
-                <p className="text-sm font-medium text-slate-900">{s.label}</p>
-                <p className="mt-1 text-xs text-slate-500">{s.blurb}</p>
+              <Card className="h-full transition hover:border-navy">
+                <p className="text-sm font-medium text-ink">{s.label}</p>
+                <p className="mt-1 text-xs text-body">{s.blurb}</p>
               </Card>
             </button>
           </form>
         ))}
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold text-slate-900">
+      <h2 className="mb-3 text-sm font-semibold text-ink">
         Recent conversations
       </h2>
       {(conversations ?? []).length === 0 ? (
@@ -67,10 +67,10 @@ export default async function AgentPage() {
         <div className="flex flex-col gap-2">
           {(conversations ?? []).map((c) => (
             <Link key={c.id} href={`/agent/${c.id}`}>
-              <Card className="p-3 transition hover:border-slate-400">
+              <Card className="p-3 transition hover:border-navy">
                 <div className="flex items-center justify-between gap-4">
-                  <p className="truncate text-sm text-slate-800">{c.title}</p>
-                  <span className="shrink-0 text-xs text-slate-500">
+                  <p className="truncate text-sm text-body">{c.title}</p>
+                  <span className="shrink-0 text-xs text-body">
                     {new Date(c.updated_at).toLocaleDateString()}
                   </span>
                 </div>

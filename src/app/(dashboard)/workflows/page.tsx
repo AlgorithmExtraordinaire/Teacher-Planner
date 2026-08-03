@@ -43,7 +43,7 @@ export default async function WorkflowsPage() {
         <StatTile label="Alerts (recent runs)" value={totalAlerts} />
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold text-slate-900">
+      <h2 className="mb-3 text-sm font-semibold text-ink">
         Configured workflows
       </h2>
 
@@ -64,18 +64,18 @@ export default async function WorkflowsPage() {
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-medium text-slate-900">
+                      <p className="text-sm font-medium text-ink">
                         {w.name}
                       </p>
                       <Badge value={w.cadence} />
                       <Badge value={w.severity} />
                       {!w.is_enabled && <Badge value="inactive" />}
                     </div>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-body">
                       {rule?.label ?? w.rule_type}
                       {w.description ? ` · ${w.description}` : ""}
                     </p>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="mt-1 text-xs text-body">
                       Last run:{" "}
                       {w.last_run_at
                         ? new Date(w.last_run_at).toLocaleString()
@@ -88,7 +88,7 @@ export default async function WorkflowsPage() {
                       <input type="hidden" name="id" value={w.id} />
                       <button
                         type="submit"
-                        className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800"
+                        className="rounded-md bg-crimson px-3 py-1.5 text-sm font-medium text-white hover:bg-crimson-hover"
                       >
                         Run now
                       </button>
@@ -103,7 +103,7 @@ export default async function WorkflowsPage() {
                         />
                         <button
                           type="submit"
-                          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
+                          className="rounded-md border border-line px-3 py-1.5 text-sm font-medium text-body hover:bg-[#f1f4f8]"
                         >
                           {w.is_enabled ? "Disable" : "Enable"}
                         </button>
@@ -117,21 +117,21 @@ export default async function WorkflowsPage() {
         </div>
       )}
 
-      <h2 className="mb-3 mt-10 text-sm font-semibold text-slate-900">
+      <h2 className="mb-3 mt-10 text-sm font-semibold text-ink">
         Recent runs
       </h2>
       {(runs ?? []).length === 0 ? (
         <EmptyState message="No runs yet." />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-lg border border-line bg-white shadow-sm">
           <table className="w-full min-w-max text-left text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50">
+            <thead className="border-b border-line bg-[#f7f9fc]">
               <tr>
                 {["Workflow", "Started", "Status", "Matches", "Alerts", "Summary"].map(
                   (h) => (
                     <th
                       key={h}
-                      className="whitespace-nowrap px-4 py-2.5 font-medium text-slate-600"
+                      className="whitespace-nowrap px-4 py-2.5 font-medium text-body"
                     >
                       {h}
                     </th>
@@ -139,25 +139,25 @@ export default async function WorkflowsPage() {
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-line">
               {(runs ?? []).map((r) => (
-                <tr key={r.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-2.5 text-slate-700">
+                <tr key={r.id} className="hover:bg-[#f7f9fc]">
+                  <td className="px-4 py-2.5 text-body">
                     {r.workflows?.name ?? "—"}
                   </td>
-                  <td className="px-4 py-2.5 text-slate-700">
+                  <td className="px-4 py-2.5 text-body">
                     {new Date(r.started_at).toLocaleString()}
                   </td>
                   <td className="px-4 py-2.5">
                     <Badge value={r.status} />
                   </td>
-                  <td className="px-4 py-2.5 tabular-nums text-slate-700">
+                  <td className="px-4 py-2.5 tabular-nums text-body">
                     {r.matches_found}
                   </td>
-                  <td className="px-4 py-2.5 tabular-nums text-slate-700">
+                  <td className="px-4 py-2.5 tabular-nums text-body">
                     {r.alerts_created}
                   </td>
-                  <td className="px-4 py-2.5 text-slate-700">
+                  <td className="px-4 py-2.5 text-body">
                     {formatCell(r.error_message ?? r.summary)}
                   </td>
                 </tr>

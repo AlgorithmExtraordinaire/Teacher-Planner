@@ -84,9 +84,9 @@ export default async function FoldersPage() {
         <Card className="mb-3">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <p className="text-sm font-medium text-slate-900">{f.name}</p>
+              <p className="text-sm font-medium text-ink">{f.name}</p>
               {f.is_ai_generated && <Badge value="ai suggested" />}
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-body">
                 {contents.length} item{contents.length === 1 ? "" : "s"}
               </span>
             </div>
@@ -94,7 +94,7 @@ export default async function FoldersPage() {
               <input type="hidden" name="folder_id" value={f.id} />
               <button
                 type="submit"
-                className="text-xs font-medium text-slate-500 hover:text-red-600"
+                className="text-xs font-medium text-body hover:text-red-600"
               >
                 Delete
               </button>
@@ -102,7 +102,7 @@ export default async function FoldersPage() {
           </div>
 
           {contents.length === 0 ? (
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-body">
               Empty — add files from the{" "}
               <Link href="/resources" className="underline">
                 catalogue
@@ -110,14 +110,14 @@ export default async function FoldersPage() {
               .
             </p>
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-line">
               {contents.map((it) => (
                 <li key={it.id} className="flex items-center gap-3 py-2">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm text-slate-700">
+                    <p className="truncate text-sm text-body">
                       {it.resources?.name ?? "(missing file)"}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-body">
                       {it.resources?.doc_role
                         ? `${it.resources.doc_role.replace(/_/g, " ")} · `
                         : ""}
@@ -129,7 +129,7 @@ export default async function FoldersPage() {
                       href={it.resources.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="shrink-0 text-xs font-medium text-slate-500 hover:text-slate-900"
+                      className="shrink-0 text-xs font-medium text-body hover:text-ink"
                     >
                       Open
                     </a>
@@ -138,7 +138,7 @@ export default async function FoldersPage() {
                     <input type="hidden" name="item_id" value={it.id} />
                     <button
                       type="submit"
-                      className="shrink-0 text-xs text-slate-500 hover:text-red-600"
+                      className="shrink-0 text-xs text-body hover:text-red-600"
                     >
                       Remove
                     </button>
@@ -162,7 +162,7 @@ export default async function FoldersPage() {
         />
         <Link
           href="/resources"
-          className="h-fit rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+          className="h-fit rounded-md border border-line px-3 py-2 text-sm font-medium text-body hover:bg-[#f1f4f8]"
         >
           Browse catalogue
         </Link>
