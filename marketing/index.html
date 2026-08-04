@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="lean-academy">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduPlan Pro — Departmental Planning, Analytics &amp; Governance</title>
+<meta name="description" content="Enterprise teacher and departmental planner: co-planned lessons, lean academic analytics, and institutional governance in one workspace.">
+<meta name="color-scheme" content="light dark">
+
+<!--
+  Applies the saved theme before first paint. Without it the page renders in
+  Lean Academy and then snaps to a saved dark theme — a visible flash.
+-->
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('ep-theme');
+      if (t === 'lean-academy' || t === 'zen-workspace' || t === 'deep-work') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    } catch (e) {}
+  })();
+</script>
+
+<style>
+/* ==========================================================================
+   EDUPLAN PRO — 3-in-1 DESIGN SYSTEM
+   Themes switch via [data-theme] on <html>. Every colour, radius, shadow and
+   typeface resolves through custom properties, so no component knows a theme
+   exists.
+
+   Fonts are declared as stacks rather than fetched from a CDN: a landing page
+   should render its copy immediately, not block on a third-party request.
+   Self-host Inter and Poppins (or add an @import) and they upgrade in place.
+   ========================================================================== */
+
+/* ---------------- THEME 1: LEAN ACADEMY (default) ---------------- */
+:root,
+[data-theme="lean-academy"] {
+  --color-primary: #1B365D;
+  --color-primary-hover: #2A4C7E;
+  --color-accent: #D4AF37;
+  --color-alert: #8A1538;
+
+  --bg-app: #F4F7F9;
+  --bg-surface: #FFFFFF;
+  --bg-sidebar: var(--color-primary);
+
+  --font-base: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --text-main: #1A202C;
+  --text-muted: #4A5568;
+  --text-inverse: #FFFFFF;
+
+  --border-color: #CBD5E1;
+  --border-width: 1px;
+  --radius-card: 4px;
+  --radius-btn: 4px;
+  --shadow-card: 0 1px 3px rgba(0,0,0,.05);
+
+  --status-success: #276749;
+  --status-warning: #B7791F;
+  --status-danger: var(--color-alert);
+  --on-success: #FFFFFF;
+  --on-warning: #FFFFFF;
+  --on-danger: #FFFFFF;
+
+  /* Text placed on an accent fill. Gold needs dark text — white on gold is
+     1.9:1 and unreadable. */
+  --on-accent: var(--color-primary);
+  --hero-tint: rgba(27,54,93,.06);
+}
+
+/* ---------------- THEME 2: ZEN WORKSPACE ---------------- */
+[data-theme="zen-workspace"] {
+  --color-primary: #8BA89F;
+  --color-primary-hover: #7A978E;
+  --color-accent: #AEC4D6;
+  --color-alert: #B06A53;
+
+  --bg-app: #F9FAFB;
+  --bg-surface: #FFFFFF;
+  --bg-sidebar: #F9FAFB;
+
+  --font-base: 'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --text-main: #374151;
+  /* Specified as #9CA3AF, which is 2.48:1 here and fails AA. Darkened one
+     step to 4.63:1 — the smallest change that keeps the soft grey. */
+  --text-muted: #6B7280;
+  --text-inverse: #374151;
+
+  --border-color: transparent;
+  --border-width: 0px;
+  --radius-card: 16px;
+  --radius-btn: 12px;
+  --shadow-card: 0 10px 25px -5px rgba(0,0,0,.05), 0 8px 10px -6px rgba(0,0,0,.02);
+
+  /* Sage at #8BA89F is 2.56:1 under white; deepened so status text reads. */
+  --status-success: #4F6F65;
+  --status-warning: #FCD34D;
+  --status-danger: #B06A53;
+  --on-success: #FFFFFF;
+  --on-warning: #1F2937;
+  --on-danger: #FFFFFF;
+
+  --on-accent: #2F4356;
+  --hero-tint: rgba(139,168,159,.10);
+}
+
+/* ---------------- THEME 3: DEEP WORK ---------------- */
+[data-theme="deep-work"] {
+  --color-primary: #B388FF;
+  --color-primary-hover: #D1B3FF;
+  --color-accent: #00E5FF;
+  --color-alert: #FF5252;
+
+  --bg-app: #121212;
+  --bg-surface: #1E1E1E;
+  --bg-sidebar: #181818;
+
+  --font-base: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --text-main: #F3F4F6;
+  --text-muted: #A6ADBB;
+  --text-inverse: #121212;
+
+  --border-color: #333333;
+  --border-width: 1px;
+  --radius-card: 8px;
+  --radius-btn: 6px;
+  --shadow-card: 0 4px 6px rgba(0,0,0,.3);
+
+  --status-success: #69F0AE;
+  --status-warning: #FFD740;
+  --status-danger: #FF5252;
+  /* Neon fills are light, so their labels go dark. */
+  --on-success: #06281A;
+  --on-warning: #000000;
+  --on-danger: #2B0000;
+
+  --on-accent: #04222A;
+  --hero-tint: rgba(179,136,255,.10);
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-base);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color .3s ease, color .3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+
+h1, h2, h3, h4 { font-weight: 600; line-height: 1.2; text-wrap: balance; }
+p { max-width: 68ch; }
+a { color: inherit; }
+
+.mono-metric { font-family: var(--font-mono); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--color-primary); color: #fff;
+  padding: .75rem 1.25rem; border-radius: 0 0 var(--radius-btn) 0;
+}
+.skip-link:focus { left: 0; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.shell { width: min(1200px, 100% - 3rem); margin-inline: auto; }
+
+/* ==========================================================================
+   COMPONENTS
+   ========================================================================== */
+.card {
+  background-color: var(--bg-surface);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 1.75rem;
+  transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease, transform .2s ease;
+}
+.card--interactive:hover { transform: translateY(-2px); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  padding: .625rem 1.25rem;
+  border: none; border-radius: var(--radius-btn);
+  font: inherit; font-weight: 500; font-size: .9375rem;
+  cursor: pointer;
+  transition: background-color .2s ease, box-shadow .2s ease, transform .1s ease;
+}
+.btn:active { transform: translateY(1px); }
+
+.btn-primary { background-color: var(--color-primary); color: #FFFFFF; }
+.btn-primary:hover { background-color: var(--color-primary-hover); }
+
+.btn-accent { background-color: var(--color-accent); color: var(--on-accent); font-weight: 600; }
+.btn-accent:hover { filter: brightness(.94); }
+
+.btn-ghost {
+  background: transparent; color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+[data-theme="zen-workspace"] .btn-ghost { border-color: #E5E7EB; }
+.btn-ghost:hover { background: var(--hero-tint); }
+
+.btn-lg { padding: .9rem 2rem; font-size: 1.0625rem; }
+
+[data-theme="deep-work"] .btn-primary:hover { box-shadow: 0 0 14px rgba(179,136,255,.45); }
+[data-theme="deep-work"] .btn-accent:hover  { box-shadow: 0 0 14px rgba(0,229,255,.45); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: .375rem;
+  padding: .25rem .75rem; border-radius: 9999px;
+  font-size: .8125rem; font-weight: 500;
+}
+.badge-success { background-color: var(--status-success); color: var(--on-success); }
+.badge-warning { background-color: var(--status-warning); color: var(--on-warning); }
+.badge-danger  { background-color: var(--status-danger);  color: var(--on-danger); }
+
+.eyebrow {
+  font-size: .75rem; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--color-primary);
+}
+[data-theme="deep-work"] .eyebrow { color: var(--color-accent); }
+
+/* ==========================================================================
+   MASTHEAD + THEME BAR
+   ========================================================================== */
+.masthead {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color .3s ease;
+}
+[data-theme="zen-workspace"] .masthead { border-bottom-color: #EEF0F2; }
+
+.masthead__inner {
+  display: flex; flex-wrap: wrap; gap: 1rem;
+  align-items: center; justify-content: space-between;
+  padding: .875rem 0;
+}
+
+.brand { display: flex; align-items: center; gap: .625rem; font-weight: 700; letter-spacing: -.01em; }
+.brand__mark {
+  width: 28px; height: 28px; border-radius: 6px; flex: none;
+  background: var(--color-primary);
+  display: grid; place-items: center;
+  color: #fff; font-size: .8125rem; font-weight: 700;
+}
+[data-theme="deep-work"] .brand__mark { color: #121212; }
+
+/* Theme chips: a colour swatch carries the identity, so the control stays
+   legible in every theme instead of hardcoding a fill. */
+.theme-switch { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.theme-switch__label { font-size: .8125rem; font-weight: 600; color: var(--text-muted); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .4rem .75rem;
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
+  font: inherit; font-size: .8125rem; font-weight: 500;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: border-color .2s ease, background-color .2s ease;
+}
+[data-theme="zen-workspace"] .chip { border-color: #E5E7EB; }
+.chip:hover { border-color: var(--color-primary); }
+.chip[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--hero-tint);
+  font-weight: 600;
+}
+.chip__dot { width: 12px; height: 12px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+
+/* ==========================================================================
+   HERO
+   ========================================================================== */
+.hero { padding: clamp(3rem, 8vw, 6rem) 0 3rem; text-align: center; }
+.hero h1 {
+  font-size: clamp(2.125rem, 5.2vw, 3.25rem);
+  letter-spacing: -.02em;
+  margin: 1rem auto 1.25rem;
+  max-width: 18ch;
+}
+.hero__lede {
+  font-size: clamp(1.0625rem, 2vw, 1.25rem);
+  color: var(--text-muted);
+  margin: 0 auto 2rem;
+  max-width: 58ch;
+}
+.cta-group { display: flex; flex-wrap: wrap; gap: .875rem; justify-content: center; }
+.hero__trust {
+  margin: 1.5rem auto 0; font-size: .875rem; color: var(--text-muted);
+  display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; justify-content: center;
+}
+.hero__trust span { display: inline-flex; align-items: center; gap: .4rem; }
+.tick { color: var(--status-success); font-weight: 700; }
+
+/* ==========================================================================
+   DASHBOARD MOCKUP
+   ========================================================================== */
+.mockup {
+  margin-top: 3rem;
+  background: var(--bg-surface);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: calc(var(--radius-card) * 2);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  text-align: left;
+}
+[data-theme="zen-workspace"] .mockup { border: 1px solid #EEF0F2; }
+
+.mockup__chrome {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-app);
+}
+[data-theme="zen-workspace"] .mockup__chrome { border-bottom-color: #EEF0F2; }
+.dots { display: flex; gap: .375rem; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--border-color); }
+[data-theme="zen-workspace"] .dots i { background: #E5E7EB; }
+.mockup__url {
+  flex: 1; text-align: center; font-size: .75rem; color: var(--text-muted);
+}
+
+.mockup__tabs {
+  display: flex; gap: .25rem; padding: .75rem 1rem 0;
+  border-bottom: 1px solid var(--border-color); flex-wrap: wrap;
+}
+[data-theme="zen-workspace"] .mockup__tabs { border-bottom-color: #EEF0F2; }
+.tab {
+  appearance: none; background: none; border: none;
+  font: inherit; font-size: .875rem; font-weight: 500;
+  color: var(--text-muted);
+  padding: .5rem .875rem; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tab:hover { color: var(--text-main); }
+.tab[aria-selected="true"] {
+  color: var(--color-primary); border-bottom-color: var(--color-primary); font-weight: 600;
+}
+[data-theme="deep-work"] .tab[aria-selected="true"] { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+
+.mockup__body { padding: 1.5rem; }
+.mockup__note {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem;
+}
+.panel[hidden] { display: none; }
+
+.kpi-row { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.kpi { padding: 1.25rem; }
+.kpi h4 { font-size: .8125rem; color: var(--text-muted); font-weight: 500; }
+.kpi .figure { font-size: 2rem; margin: .35rem 0 .2rem; font-weight: 700; letter-spacing: -.02em; }
+.kpi small { font-size: .8125rem; color: var(--text-muted); }
+.f-primary { color: var(--color-primary); }
+.f-accent  { color: var(--text-main); }
+.f-alert   { color: var(--color-alert); }
+
+/* A pure-CSS trend bar — no chart library, no external request. */
+.spark { display: flex; align-items: flex-end; gap: 4px; height: 56px; margin-top: 1rem; }
+.spark i {
+  flex: 1; background: var(--color-primary); opacity: .25; border-radius: 2px 2px 0 0;
+}
+.spark i:last-child { opacity: 1; }
+
+.kanban { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.kanban__col h4 {
+  font-size: .8125rem; padding-bottom: .4rem; margin-bottom: .75rem;
+  border-bottom: 2px solid var(--border-color);
+}
+.kanban__col:nth-child(1) h4 { border-bottom-color: var(--color-primary); }
+.kanban__col:nth-child(2) h4 { border-bottom-color: var(--color-accent); }
+.kanban__col:nth-child(3) h4 { border-bottom-color: var(--color-alert); }
+.ticket {
+  background: var(--bg-app); border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn); padding: .625rem .75rem;
+  font-size: .875rem; margin-bottom: .5rem;
+}
+[data-theme="zen-workspace"] .ticket { border-color: #EEF0F2; }
+.ticket small { display: block; color: var(--text-muted); font-size: .75rem; margin-top: .2rem; }
+
+.table-wrap { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-size: .875rem; min-width: 520px; }
+.data-table th {
+  text-align: left; padding: .625rem .75rem; color: var(--text-muted);
+  font-weight: 600; font-size: .75rem; letter-spacing: .06em; text-transform: uppercase;
+  border-bottom: 2px solid var(--border-color);
+}
+.data-table td { padding: .75rem; border-bottom: 1px solid var(--border-color); }
+[data-theme="zen-workspace"] .data-table th,
+[data-theme="zen-workspace"] .data-table td { border-color: #EEF0F2; }
+
+/* ==========================================================================
+   FEATURE SECTIONS
+   ========================================================================== */
+.section { padding: clamp(3rem, 7vw, 5rem) 0; }
+.section__head { max-width: 62ch; margin-bottom: 2.5rem; }
+.section__head h2 { font-size: clamp(1.5rem, 3.2vw, 2.125rem); margin: .5rem 0 .75rem; letter-spacing: -.015em; }
+.section__head p { color: var(--text-muted); font-size: 1.0625rem; }
+
+.grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+.feature h3 { font-size: 1.0625rem; margin-bottom: .5rem; }
+.feature p { color: var(--text-muted); font-size: .9375rem; }
+.feature__icon {
+  width: 38px; height: 38px; border-radius: var(--radius-btn);
+  background: var(--hero-tint); color: var(--color-primary);
+  display: grid; place-items: center; margin-bottom: 1rem;
+  font-size: 1.0625rem; font-weight: 700;
+}
+[data-theme="deep-work"] .feature__icon { color: var(--color-accent); }
+
+.section--tint { background: var(--bg-surface); border-block: 1px solid var(--border-color); }
+[data-theme="zen-workspace"] .section--tint { border-block-color: #EEF0F2; }
+
+/* ==========================================================================
+   THEME SHOWCASE
+   ========================================================================== */
+.themes { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.theme-card { text-align: left; cursor: pointer; width: 100%; font: inherit; text-align: left; }
+.theme-card[aria-pressed="true"] { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.swatches { display: flex; gap: .5rem; margin-bottom: 1rem; }
+.swatches i { width: 100%; height: 40px; border-radius: var(--radius-btn); box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+.theme-card h3 { font-size: 1.0625rem; margin-bottom: .35rem; }
+.theme-card p { font-size: .875rem; color: var(--text-muted); }
+
+/* ==========================================================================
+   CTA + FOOTER
+   ========================================================================== */
+.cta-block {
+  text-align: center;
+  background: var(--color-primary);
+  border-radius: calc(var(--radius-card) * 2);
+  padding: clamp(2.5rem, 6vw, 4rem) 2rem;
+  color: #fff;
+}
+[data-theme="deep-work"] .cta-block { color: #121212; }
+.cta-block h2 { font-size: clamp(1.5rem, 3.4vw, 2.25rem); margin-bottom: .875rem; letter-spacing: -.015em; }
+.cta-block p {
+  margin: 0 auto 2rem; max-width: 54ch; font-size: 1.0625rem;
+  color: rgba(255,255,255,.85);
+}
+[data-theme="deep-work"] .cta-block p { color: rgba(18,18,18,.75); }
+.cta-block .btn-ghost {
+  color: #fff; border-color: rgba(255,255,255,.5); background: transparent;
+}
+[data-theme="deep-work"] .cta-block .btn-ghost { color: #121212; border-color: rgba(18,18,18,.4); }
+.cta-block .btn-ghost:hover { background: rgba(255,255,255,.12); }
+
+.site-footer {
+  padding: 2.5rem 0 3rem; border-top: 1px solid var(--border-color);
+  margin-top: clamp(3rem, 7vw, 5rem);
+  font-size: .875rem; color: var(--text-muted);
+  display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between;
+}
+.site-footer nav { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+.site-footer a { text-decoration: none; }
+.site-footer a:hover { color: var(--text-main); text-decoration: underline; }
+
+.disclosure {
+  margin-top: 1rem; font-size: .8125rem; color: var(--text-muted);
+  border-left: 3px solid var(--border-color); padding-left: .875rem;
+}
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- ====================== MASTHEAD ====================== -->
+<header class="masthead">
+  <div class="shell masthead__inner">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true">EP</span>
+      <span>EduPlan&nbsp;Pro</span>
+    </div>
+
+    <div class="theme-switch" role="group" aria-label="Preview colour theme">
+      <span class="theme-switch__label" id="theme-label">Preview theme</span>
+      <button class="chip" type="button" data-theme-btn="lean-academy" aria-pressed="true">
+        <span class="chip__dot" style="background:#1B365D" aria-hidden="true"></span>Lean Academy
+      </button>
+      <button class="chip" type="button" data-theme-btn="zen-workspace" aria-pressed="false">
+        <span class="chip__dot" style="background:#8BA89F" aria-hidden="true"></span>Zen Workspace
+      </button>
+      <button class="chip" type="button" data-theme-btn="deep-work" aria-pressed="false">
+        <span class="chip__dot" style="background:#B388FF" aria-hidden="true"></span>Deep Work
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ====================== HERO ====================== -->
+  <section class="hero shell" aria-labelledby="hero-title">
+    <p class="eyebrow">For teachers, heads of department &amp; academic officers</p>
+    <h1 id="hero-title">Departmental planning that holds itself to account</h1>
+    <p class="hero__lede">
+      Co-plan lessons across grade levels, watch learning trends before they become
+      exam results, and keep every approval on the record — in one workspace your
+      whole department actually uses.
+    </p>
+
+    <div class="cta-group">
+      <button class="btn btn-primary btn-lg" type="button">Start free trial</button>
+      <button class="btn btn-accent btn-lg" type="button">Schedule institutional demo</button>
+    </div>
+
+    <p class="hero__trust">
+      <span><span class="tick" aria-hidden="true">✓</span> Row-level security on every record</span>
+      <span><span class="tick" aria-hidden="true">✓</span> Append-only audit trail</span>
+      <span><span class="tick" aria-hidden="true">✓</span> No credit card required</span>
+    </p>
+
+    <!-- Interactive dashboard preview -->
+    <div class="mockup">
+      <div class="mockup__chrome">
+        <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="mockup__url">planner.your-school.edu</span>
+      </div>
+
+      <div class="mockup__tabs" role="tablist" aria-label="Dashboard preview">
+        <button class="tab" role="tab" id="tab-analytics" aria-controls="panel-analytics" aria-selected="true">Analytics</button>
+        <button class="tab" role="tab" id="tab-planning"  aria-controls="panel-planning"  aria-selected="false" tabindex="-1">Lesson planning</button>
+        <button class="tab" role="tab" id="tab-approvals" aria-controls="panel-approvals" aria-selected="false" tabindex="-1">Approvals</button>
+      </div>
+
+      <div class="mockup__body">
+        <div class="mockup__note">
+          <span class="mono-metric" style="color:var(--text-muted); font-size:.8125rem;">SAMPLE WORKSPACE · ILLUSTRATIVE DATA</span>
+          <span class="badge badge-success">Live collaboration active</span>
+        </div>
+
+        <!-- Panel: Analytics -->
+        <section class="panel" id="panel-analytics" role="tabpanel" aria-labelledby="tab-analytics">
+          <div class="kpi-row">
+            <article class="card kpi">
+              <h4>Curriculum coverage</h4>
+              <p class="figure mono-metric f-primary">94.2%</p>
+              <small>+4.1 pts after the last review cycle</small>
+            </article>
+            <article class="card kpi">
+              <h4>Learners tracked</h4>
+              <p class="figure mono-metric f-accent">312</p>
+              <small>Across 8 grade levels</small>
+            </article>
+            <article class="card kpi">
+              <h4>Flagged for intervention</h4>
+              <p class="figure mono-metric f-alert">7</p>
+              <small>Surfaced before term-end reporting</small>
+            </article>
+          </div>
+          <div class="card" style="margin-top:1rem;">
+            <h4 style="font-size:.8125rem; color:var(--text-muted); font-weight:500;">Mastery trend · last 10 assessments</h4>
+            <div class="spark" role="img" aria-label="Upward mastery trend across the last ten assessments">
+              <i style="height:38%"></i><i style="height:45%"></i><i style="height:41%"></i>
+              <i style="height:52%"></i><i style="height:58%"></i><i style="height:55%"></i>
+              <i style="height:67%"></i><i style="height:72%"></i><i style="height:79%"></i>
+              <i style="height:92%"></i>
+            </div>
+          </div>
+        </section>
+
+        <!-- Panel: Lesson planning -->
+        <section class="panel" id="panel-planning" role="tabpanel" aria-labelledby="tab-planning" hidden>
+          <div class="kanban">
+            <div class="kanban__col">
+              <h4>Draft</h4>
+              <div class="ticket">Grade 6 — Fractions, Module 3<small>Ms Nangolo · due Friday</small></div>
+              <div class="ticket">Grade 4 — Persuasive writing<small>Unassigned</small></div>
+            </div>
+            <div class="kanban__col">
+              <h4>Submitted</h4>
+              <div class="ticket">Grade 8 — Forces &amp; motion<small>Awaiting H.O.D. review</small></div>
+            </div>
+            <div class="kanban__col">
+              <h4>Approved</h4>
+              <div class="ticket">Grade 3 — Reading comprehension<small>Signed off 2 days ago</small></div>
+              <div class="ticket">Grade 7 — Civics unit opener<small>Signed off last week</small></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Panel: Approvals -->
+        <section class="panel" id="panel-approvals" role="tabpanel" aria-labelledby="tab-approvals" hidden>
+          <div class="table-wrap">
+            <table class="data-table">
+              <caption class="visually-hidden">Recent departmental authorisations</caption>
+              <thead>
+                <tr><th scope="col">Item</th><th scope="col">Description</th><th scope="col">Category</th><th scope="col">Status</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mono-metric">#1042</td>
+                  <td>Elementary policy index revision</td>
+                  <td>Governance</td>
+                  <td><span class="badge badge-success">Approved</span></td>
+                </tr>
+                <tr>
+                  <td class="mono-metric">#1043</td>
+                  <td>Departmental resource requisition</td>
+                  <td>Financial</td>
+                  <td><span class="badge badge-warning">Awaiting H.O.D.</span></td>
+                </tr>
+                <tr>
+                  <td class="mono-metric">#1044</td>
+                  <td>Term 3 scheme of work — Science</td>
+                  <td>Curriculum</td>
+                  <td><span class="badge badge-danger">Returned</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <p class="disclosure">
+      The preview above is a product illustration with sample figures, not a live
+      institutional dashboard. Your own workspace shows only what your school records.
+    </p>
+  </section>
+
+  <!-- ====================== FEATURE 1 ====================== -->
+  <section class="section section--tint" aria-labelledby="collab-title">
+    <div class="shell">
+      <div class="section__head">
+        <p class="eyebrow">Collaboration</p>
+        <h2 id="collab-title">Planning stops being a folder on someone's laptop</h2>
+        <p>Departments teach as a team. The planning ought to work that way too — shared, reviewable, and never dependent on one person being reachable.</p>
+      </div>
+      <div class="grid">
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">◫</div>
+          <h3>Co-planned lessons</h3>
+          <p>Two teachers can build the same scheme of work without emailing versions back and forth. Changes are attributed, so it is always clear who wrote what.</p>
+        </article>
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">▤</div>
+          <h3>Shared curriculum drive</h3>
+          <p>Textbooks, teacher guides and module materials indexed by subject, grade and teaching role — filed once, found by everyone.</p>
+        </article>
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">✓</div>
+          <h3>Departmental approvals</h3>
+          <p>Submit a plan, a head of department signs it off, and the decision is recorded. No more "I thought you had approved it".</p>
+        </article>
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">❝</div>
+          <h3>Inline feedback</h3>
+          <p>Comment on the differentiation section rather than the whole document. Mentoring happens where the work is, not in a separate thread.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== FEATURE 2 ====================== -->
+  <section class="section" aria-labelledby="analytics-title">
+    <div class="shell">
+      <div class="section__head">
+        <p class="eyebrow">Analytics</p>
+        <h2 id="analytics-title">See the drift while there is still term left to fix it</h2>
+        <p>Most schools discover a struggling class at reporting time. Continuous tracking moves that discovery forward by weeks.</p>
+      </div>
+      <div class="grid">
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">◗</div>
+          <h3>Student progress trends</h3>
+          <p>Standards-based mastery per learner, per subject, over time — so a slide shows as a slope, not a surprise.</p>
+        </article>
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">≡</div>
+          <h3>Curriculum pacing</h3>
+          <p>Compare planned against actual module completion by class. Falling behind becomes visible in week three, not week ten.</p>
+        </article>
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">◎</div>
+          <h3>Quality cycles</h3>
+          <p>Define a measure, track it across a term, and keep the evidence of whether the intervention actually moved it.</p>
+        </article>
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">▦</div>
+          <h3>Attendance analytics</h3>
+          <p>Attendance beside attainment, because the two explain each other more often than either explains itself.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== FEATURE 3 ====================== -->
+  <section class="section section--tint" aria-labelledby="gov-title">
+    <div class="shell">
+      <div class="section__head">
+        <p class="eyebrow">Governance</p>
+        <h2 id="gov-title">Compliance you can evidence, not just assert</h2>
+        <p>When an inspector, a board, or a parent asks how a decision was made, the answer should take a minute to find.</p>
+      </div>
+      <div class="grid">
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">§</div>
+          <h3>Master policy index</h3>
+          <p>Every policy in one register with an owner and a review date, so nothing quietly goes stale for three years.</p>
+        </article>
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">⧉</div>
+          <h3>Append-only audit trail</h3>
+          <p>Approvals, role changes and configuration edits are written to a log with no update or delete path. Records cannot be quietly rewritten.</p>
+        </article>
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">⚿</div>
+          <h3>Authorisation workflows</h3>
+          <p>Role-scoped sign-off with a genuine ceiling: only a platform owner can change who holds which role.</p>
+        </article>
+        <article class="card card--interactive feature">
+          <div class="feature__icon" aria-hidden="true">⛨</div>
+          <h3>Row-level security</h3>
+          <p>Permissions live in the database, not the interface. A hidden button is not a control; a policy is.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== THEME SHOWCASE ====================== -->
+  <section class="section" aria-labelledby="themes-title">
+    <div class="shell">
+      <div class="section__head">
+        <p class="eyebrow">Design system</p>
+        <h2 id="themes-title">Three interfaces, one product</h2>
+        <p>Staff work differently. Pick a theme below and the entire page re-renders instantly — the same switch your team gets inside the app.</p>
+      </div>
+
+      <div class="themes" role="group" aria-label="Choose a theme to preview">
+        <button class="card card--interactive theme-card" type="button" data-theme-btn="lean-academy" aria-pressed="true">
+          <div class="swatches" aria-hidden="true">
+            <i style="background:#1B365D"></i><i style="background:#D4AF37"></i><i style="background:#8A1538"></i><i style="background:#F4F7F9"></i>
+          </div>
+          <h3>Lean Academy</h3>
+          <p>Institutional and high-contrast. Sharp corners, hairline borders, dense tables. Built for administrators reading a lot of numbers.</p>
+        </button>
+
+        <button class="card card--interactive theme-card" type="button" data-theme-btn="zen-workspace" aria-pressed="false">
+          <div class="swatches" aria-hidden="true">
+            <i style="background:#8BA89F"></i><i style="background:#AEC4D6"></i><i style="background:#B06A53"></i><i style="background:#F9FAFB"></i>
+          </div>
+          <h3>Zen Workspace</h3>
+          <p>Calm and generous. Soft corners, borderless cards, muted palette. For teachers who spend a full planning period in one screen.</p>
+        </button>
+
+        <button class="card card--interactive theme-card" type="button" data-theme-btn="deep-work" aria-pressed="false">
+          <div class="swatches" aria-hidden="true">
+            <i style="background:#B388FF"></i><i style="background:#00E5FF"></i><i style="background:#FF5252"></i><i style="background:#121212"></i>
+          </div>
+          <h3>Deep Work</h3>
+          <p>Low-glare dark mode with vivid active states. For late marking sessions and anyone who finds bright screens tiring.</p>
+        </button>
+      </div>
+
+      <p class="disclosure">
+        Every theme meets WCAG AA contrast for body text. Colour is a preference;
+        legibility is not.
+      </p>
+    </div>
+  </section>
+
+  <!-- ====================== CTA ====================== -->
+  <section class="section" aria-labelledby="cta-title">
+    <div class="shell">
+      <div class="cta-block">
+        <h2 id="cta-title">Bring your department onto one system</h2>
+        <p>A 30-minute walkthrough with your own curriculum structure — no slideware. We will show you the planner running against a department like yours.</p>
+        <div class="cta-group">
+          <button class="btn btn-accent btn-lg" type="button">Schedule institutional demo</button>
+          <button class="btn btn-ghost btn-lg" type="button">Talk to the team</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer shell">
+  <p>© <span id="year">2026</span> EduPlan Pro. Built for schools that plan on purpose.</p>
+  <nav aria-label="Footer">
+    <a href="#main">Product</a>
+    <a href="#themes-title">Design system</a>
+    <a href="#cta-title">Book a demo</a>
+    <a href="#">Privacy</a>
+  </nav>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------------- Theme switching ---------------- */
+  var STORAGE_KEY = 'ep-theme';
+  var VALID = ['lean-academy', 'zen-workspace', 'deep-work'];
+  var buttons = document.querySelectorAll('[data-theme-btn]');
+
+  function setTheme(name) {
+    if (VALID.indexOf(name) === -1) return;
+    document.documentElement.setAttribute('data-theme', name);
+    try { localStorage.setItem(STORAGE_KEY, name); } catch (e) {}
+
+    // Every control that selects a theme reflects the same state, so the
+    // masthead chips and the showcase cards never disagree.
+    buttons.forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.themeBtn === name));
+    });
+  }
+
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () { setTheme(b.dataset.themeBtn); });
+  });
+
+  // Sync controls with whatever the bootstrap script applied before paint.
+  setTheme(document.documentElement.getAttribute('data-theme') || 'lean-academy');
+
+  /* ---------------- Mockup tabs (WAI-ARIA pattern) ---------------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+
+  function selectTab(tab) {
+    tabs.forEach(function (t) {
+      var selected = t === tab;
+      t.setAttribute('aria-selected', String(selected));
+      t.tabIndex = selected ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !selected;
+    });
+  }
+
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () { selectTab(tab); });
+
+    // Arrow-key navigation, which the tab pattern requires to be usable
+    // without a mouse.
+    tab.addEventListener('keydown', function (e) {
+      var next = null;
+      if (e.key === 'ArrowRight') next = tabs[(i + 1) % tabs.length];
+      if (e.key === 'ArrowLeft')  next = tabs[(i - 1 + tabs.length) % tabs.length];
+      if (e.key === 'Home')       next = tabs[0];
+      if (e.key === 'End')        next = tabs[tabs.length - 1];
+      if (next) { e.preventDefault(); selectTab(next); next.focus(); }
+    });
+  });
+
+  /* ---------------- Footer year ---------------- */
+  document.getElementById('year').textContent = String(new Date().getFullYear());
+})();
+</script>
+</body>
+</html>
