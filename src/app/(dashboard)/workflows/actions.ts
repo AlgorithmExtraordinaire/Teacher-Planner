@@ -97,5 +97,5 @@ export async function runWorkflow(formData: FormData) {
   await executeWorkflow(supabase, workflow as unknown as WorkflowRow, "manual");
 
   revalidatePath("/workflows");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
 }

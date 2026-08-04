@@ -7,7 +7,7 @@ const NAV_SECTIONS = [
   {
     label: "Dashboards",
     items: [
-      { href: "/", label: "Dashboard Overview" },
+      { href: "/dashboard", label: "Dashboard Overview" },
       { href: "/lesson-plans/new", label: "Lesson Plan Generator" },
     ],
   },

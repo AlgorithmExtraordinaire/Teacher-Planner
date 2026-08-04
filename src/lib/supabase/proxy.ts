@@ -37,15 +37,21 @@ export async function updateSession(request: NextRequest) {
   // a browser session. Redirecting it to /login would turn every scheduled run
   // into a silent 200 with a login page as the body.
   const isCron = path.startsWith("/api/cron");
+  // The public landing page. It is the site root and must render for anyone,
+  // signed in or not — bouncing it to /login would make the front door
+  // unreachable to the people it exists for.
+  const isLanding = path === "/";
 
-  if (!user && !isAuthRoute && !isPublicAsset && !isCron) {
+  if (!user && !isAuthRoute && !isPublicAsset && !isCron && !isLanding) {
     const redirectUrl = new URL("/login", request.url);
     redirectUrl.searchParams.set("next", path);
     return NextResponse.redirect(redirectUrl);
   }
 
+  // Already signed in and asking for the login form: send them to the
+  // workspace, not back to the marketing page.
   if (user && isAuthRoute) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return response;

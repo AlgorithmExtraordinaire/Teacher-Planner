@@ -154,5 +154,5 @@ export async function reviewAction(formData: FormData) {
   });
 
   revalidatePath("/agent/proposals");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
 }
