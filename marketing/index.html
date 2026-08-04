@@ -3,9 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduPlan Pro — Departmental Planning, Analytics &amp; Governance</title>
-<meta name="description" content="Enterprise teacher and departmental planner: co-planned lessons, lean academic analytics, and institutional governance in one workspace.">
+<title>Teacher &amp; Departmental Planner — Swakopmund Christian Academy</title>
+<meta name="description" content="The academic operations platform of Swakopmund Christian Academy: co-planned lessons, learning analytics, and departmental governance in one workspace.">
 <meta name="color-scheme" content="light dark">
+<link rel="icon" type="image/png" href="sca-logo.png">
+
+<meta property="og:title" content="Teacher &amp; Departmental Planner — Swakopmund Christian Academy">
+<meta property="og:description" content="Built by Swakopmund Christian Academy, for Swakopmund Christian Academy.">
+<meta property="og:image" content="sca-logo.png">
+<meta property="og:type" content="website">
 
 <!--
   Applies the saved theme before first paint. Without it the page renders in
@@ -24,7 +30,7 @@
 
 <style>
 /* ==========================================================================
-   EDUPLAN PRO — 3-in-1 DESIGN SYSTEM
+   SWAKOPMUND CHRISTIAN ACADEMY — 3-in-1 DESIGN SYSTEM
    Themes switch via [data-theme] on <html>. Every colour, radius, shadow and
    typeface resolves through custom properties, so no component knows a theme
    exists.
@@ -215,6 +221,7 @@ a { color: inherit; }
   border: none; border-radius: var(--radius-btn);
   font: inherit; font-weight: 500; font-size: .9375rem;
   cursor: pointer;
+  text-decoration: none;   /* several CTAs are anchors, not buttons */
   transition: background-color .2s ease, box-shadow .2s ease, transform .1s ease;
 }
 .btn:active { transform: translateY(1px); }
@@ -269,14 +276,22 @@ a { color: inherit; }
   padding: .875rem 0;
 }
 
-.brand { display: flex; align-items: center; gap: .625rem; font-weight: 700; letter-spacing: -.01em; }
-.brand__mark {
-  width: 28px; height: 28px; border-radius: 6px; flex: none;
-  background: var(--color-primary);
-  display: grid; place-items: center;
-  color: #fff; font-size: .8125rem; font-weight: 700;
+.brand { display: flex; align-items: center; gap: .75rem; }
+.brand__logo { width: 42px; height: auto; flex: none; }
+.brand__name { font-weight: 700; letter-spacing: -.01em; line-height: 1.15; font-size: .9375rem; }
+.brand__sub { display: block; font-weight: 500; font-size: .75rem; color: var(--text-muted); letter-spacing: 0; }
+
+/* The mark is crimson line-art on transparency; on the dark theme it keeps
+   its colour but needs a touch more presence against near-black. */
+[data-theme="deep-work"] .brand__logo,
+[data-theme="deep-work"] .hero__logo { filter: brightness(1.15) saturate(1.1); }
+
+.hero__logo { width: clamp(84px, 12vw, 116px); height: auto; margin: 0 auto 1.25rem; display: block; }
+.motto {
+  font-size: .8125rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--color-alert); font-weight: 600;
 }
-[data-theme="deep-work"] .brand__mark { color: #121212; }
+[data-theme="deep-work"] .motto { color: var(--color-accent); }
 
 /* Theme chips: a colour swatch carries the identity, so the control stays
    legible in every theme instead of hardcoding a fill. */
@@ -504,10 +519,14 @@ a { color: inherit; }
 <!-- ====================== MASTHEAD ====================== -->
 <header class="masthead">
   <div class="shell masthead__inner">
-    <div class="brand">
-      <span class="brand__mark" aria-hidden="true">EP</span>
-      <span>EduPlan&nbsp;Pro</span>
-    </div>
+    <a class="brand" href="#main" style="text-decoration:none;">
+      <img class="brand__logo" src="sca-logo.png"
+           alt="Swakopmund Christian Academy crest: a globe over an open book, held in a hand">
+      <span class="brand__name">
+        Swakopmund Christian Academy
+        <span class="brand__sub">Teacher &amp; Departmental Planner</span>
+      </span>
+    </a>
 
     <div class="theme-switch" role="group" aria-label="Preview colour theme">
       <span class="theme-switch__label" id="theme-label">Preview theme</span>
@@ -528,30 +547,31 @@ a { color: inherit; }
 
   <!-- ====================== HERO ====================== -->
   <section class="hero shell" aria-labelledby="hero-title">
-    <p class="eyebrow">For teachers, heads of department &amp; academic officers</p>
-    <h1 id="hero-title">Departmental planning that holds itself to account</h1>
+    <img class="hero__logo" src="sca-logo.png" alt="" aria-hidden="true">
+    <p class="motto">By His Power · For His Glory</p>
+    <h1 id="hero-title">Our planning, analytics and governance in one place</h1>
     <p class="hero__lede">
-      Co-plan lessons across grade levels, watch learning trends before they become
-      exam results, and keep every approval on the record — in one workspace your
-      whole department actually uses.
+      The academic operations platform of Swakopmund Christian Academy — built by
+      the Academy, for the Academy. Co-plan lessons across grade levels, see learning
+      trends while there is still term left to act, and keep every approval on the record.
     </p>
 
     <div class="cta-group">
-      <button class="btn btn-primary btn-lg" type="button">Start free trial</button>
-      <button class="btn btn-accent btn-lg" type="button">Schedule institutional demo</button>
+      <a class="btn btn-primary btn-lg" href="https://planner.elearning-swakopca.edu.na">Sign in to the planner</a>
+      <a class="btn btn-accent btn-lg" href="#cta-title">Request staff access</a>
     </div>
 
     <p class="hero__trust">
       <span><span class="tick" aria-hidden="true">✓</span> Row-level security on every record</span>
       <span><span class="tick" aria-hidden="true">✓</span> Append-only audit trail</span>
-      <span><span class="tick" aria-hidden="true">✓</span> No credit card required</span>
+      <span><span class="tick" aria-hidden="true">✓</span> Hosted for the Academy alone</span>
     </p>
 
     <!-- Interactive dashboard preview -->
     <div class="mockup">
       <div class="mockup__chrome">
         <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span class="mockup__url">planner.your-school.edu</span>
+        <span class="mockup__url">planner.elearning-swakopca.edu.na</span>
       </div>
 
       <div class="mockup__tabs" role="tablist" aria-label="Dashboard preview">
@@ -651,8 +671,8 @@ a { color: inherit; }
     </div>
 
     <p class="disclosure">
-      The preview above is a product illustration with sample figures, not a live
-      institutional dashboard. Your own workspace shows only what your school records.
+      The preview above is an illustration with sample figures — not live Academy
+      data. Signed in, the planner shows only what the Academy has actually recorded.
     </p>
   </section>
 
@@ -761,7 +781,7 @@ a { color: inherit; }
       <div class="section__head">
         <p class="eyebrow">Design system</p>
         <h2 id="themes-title">Three interfaces, one product</h2>
-        <p>Staff work differently. Pick a theme below and the entire page re-renders instantly — the same switch your team gets inside the app.</p>
+        <p>Staff work differently. Pick a theme below and this page re-renders instantly — the same switch every member of staff has inside the planner.</p>
       </div>
 
       <div class="themes" role="group" aria-label="Choose a theme to preview">
@@ -801,11 +821,15 @@ a { color: inherit; }
   <section class="section" aria-labelledby="cta-title">
     <div class="shell">
       <div class="cta-block">
-        <h2 id="cta-title">Bring your department onto one system</h2>
-        <p>A 30-minute walkthrough with your own curriculum structure — no slideware. We will show you the planner running against a department like yours.</p>
+        <h2 id="cta-title">Getting your account</h2>
+        <p>
+          Every teaching member of staff gets an account scoped to their own classes.
+          Heads of department and academic officers get approval and oversight rights.
+          Speak to IT Operations to be set up, or book a walkthrough for your department.
+        </p>
         <div class="cta-group">
-          <button class="btn btn-accent btn-lg" type="button">Schedule institutional demo</button>
-          <button class="btn btn-ghost btn-lg" type="button">Talk to the team</button>
+          <a class="btn btn-accent btn-lg" href="mailto:school.office@swakopca.com?subject=Teacher%20Planner%20access">Request staff access</a>
+          <a class="btn btn-ghost btn-lg" href="mailto:school.office@swakopca.com?subject=Planner%20walkthrough%20for%20my%20department">Book a department walkthrough</a>
         </div>
       </div>
     </div>
@@ -814,12 +838,35 @@ a { color: inherit; }
 </main>
 
 <footer class="site-footer shell">
-  <p>© <span id="year">2026</span> EduPlan Pro. Built for schools that plan on purpose.</p>
+  <div style="display:flex; gap:.875rem; align-items:flex-start;">
+    <img src="sca-logo.png" alt="" aria-hidden="true" style="width:44px; height:auto; flex:none;">
+    <div>
+      <p style="color:var(--text-main); font-weight:600; margin-bottom:.15rem;">
+        Swakopmund Christian Academy
+      </p>
+      <p style="font-style:italic; margin-bottom:.5rem;">
+        “Train up a child in the way that he should go; and when he is old
+        he will not depart from it.” — Proverbs 22:6
+      </p>
+      <address style="font-style:normal; line-height:1.7;">
+        137 Anton Lubowski Street, PO Box 1777, Swakopmund, Namibia<br>
+        Tel <a href="tel:+26464404605">+264 64 404 605</a> ·
+        <a href="mailto:school.office@swakopca.com">school.office@swakopca.com</a><br>
+        <a href="https://www.swakopca.com" rel="noopener">www.swakopca.com</a> ·
+        Reg. CC/99/1262
+      </address>
+      <p style="margin-top:.75rem;">
+        © <span id="year">2026</span> Swakopmund Christian Academy.
+        Built by the Academy, for the Academy.
+      </p>
+    </div>
+  </div>
+
   <nav aria-label="Footer">
-    <a href="#main">Product</a>
+    <a href="https://planner.elearning-swakopca.edu.na">Sign in</a>
     <a href="#themes-title">Design system</a>
-    <a href="#cta-title">Book a demo</a>
-    <a href="#">Privacy</a>
+    <a href="#cta-title">Request access</a>
+    <a href="mailto:school.office@swakopca.com">Contact</a>
   </nav>
 </footer>
 
