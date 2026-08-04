@@ -9,6 +9,7 @@ export type RuleType =
   | "intervention_followup_due"
   | "mobymax_low_engagement"
   | "language_migration_checkpoint"
+  | "calendar_coverage_low"
   | "ai_daily_digest";
 
 export type RuleParam = {
@@ -111,6 +112,21 @@ export const RULES: RuleDefinition[] = [
     description:
       "Flags 2027 language-platform candidates still pending evaluation.",
     params: [],
+  },
+  {
+    type: "calendar_coverage_low",
+    label: "Academic calendar running out",
+    description:
+      "Warns before the calendar's last recorded day arrives. Planning rules depend on it, and once it lapses they cannot tell 'all planned' from 'no data'.",
+    params: [
+      {
+        key: "min_days_ahead",
+        label: "Warn when fewer than N days remain",
+        type: "number",
+        default: 14,
+        help: "Give whoever maintains the calendar time to extend it.",
+      },
+    ],
   },
   {
     type: "ai_daily_digest",

@@ -37,6 +37,7 @@ export const TABLE_GROUPS = [
   "Integrations",
   "Resources",
   "Automation",
+  "Platform",
 ] as const;
 
 export const TABLES: TableSpec[] = [
@@ -402,6 +403,52 @@ export const TABLES: TableSpec[] = [
       { key: "status", label: "Status", kind: "badge" },
       { key: "rationale", label: "Rationale" },
       { key: "created_at", label: "Proposed", kind: "date" },
+    ],
+    orderBy: { column: "created_at", ascending: false },
+  },
+
+  // ---------------------------------------------------------------- Platform
+  // Superadmin-scoped. These are listed for completeness — RLS still decides
+  // what any given account can actually read, so an admin opening `audit_log`
+  // sees an empty table rather than a permission error.
+  {
+    name: "schools",
+    label: "Schools",
+    group: "Platform",
+    description:
+      "Tenant registry. Multi-school isolation is not yet enforced across tables.",
+    columns: [
+      { key: "name", label: "Name" },
+      { key: "code", label: "Code", kind: "badge" },
+      { key: "timezone", label: "Timezone" },
+      { key: "is_active", label: "Active", kind: "bool" },
+    ],
+    orderBy: { column: "name", ascending: true },
+  },
+  {
+    name: "system_settings",
+    label: "System Settings",
+    group: "Platform",
+    description: "Platform configuration. Writable by a superadmin only.",
+    columns: [
+      { key: "key", label: "Key" },
+      { key: "value", label: "Value" },
+      { key: "description", label: "Description" },
+      { key: "updated_at", label: "Updated", kind: "date" },
+    ],
+    orderBy: { column: "key", ascending: true },
+  },
+  {
+    name: "audit_log",
+    label: "Audit Log",
+    group: "Platform",
+    description:
+      "Append-only record of role changes, approvals, and setting edits. Readable by a superadmin only.",
+    columns: [
+      { key: "created_at", label: "When", kind: "date" },
+      { key: "action", label: "Action", kind: "badge" },
+      { key: "entity", label: "Entity" },
+      { key: "entity_id", label: "Entity ID" },
     ],
     orderBy: { column: "created_at", ascending: false },
   },

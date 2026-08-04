@@ -235,6 +235,54 @@ export async function evaluateRule(
       return { matches, note: "Candidates not yet decided." };
     }
 
+    case "calendar_coverage_low": {
+      const minDays = num(params, "min_days_ahead", 14);
+
+      const { data: lastDay } = await supabase
+        .from("academic_calendar")
+        .select("date")
+        .order("date", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!lastDay?.date) {
+        return {
+          matches: [
+            {
+              summary:
+                "The academic calendar is empty. Every planning rule that depends on school days is inert until it is populated.",
+              teacherId: null,
+            },
+          ],
+          note: "No calendar dates recorded.",
+        };
+      }
+
+      const remaining = Math.ceil(
+        (Date.parse(lastDay.date) - Date.parse(today)) / 86_400_000,
+      );
+
+      if (remaining > minDays) {
+        return {
+          matches: [],
+          note: `Calendar covers ${remaining} more day(s), through ${lastDay.date}.`,
+        };
+      }
+
+      return {
+        matches: [
+          {
+            summary:
+              remaining < 0
+                ? `The academic calendar ended ${-remaining} day(s) ago, on ${lastDay.date}. Lesson-plan gap checks are now failing rather than reporting.`
+                : `The academic calendar runs out in ${remaining} day(s), on ${lastDay.date}. Extend it before planning checks lose their reference.`,
+            teacherId: null,
+          },
+        ],
+        note: `Threshold: ${minDays} day(s).`,
+      };
+    }
+
     case "ai_daily_digest": {
       // The digest is assembled by the agent runner, which has model access.
       // Evaluated here only to surface the counts it will summarise.
