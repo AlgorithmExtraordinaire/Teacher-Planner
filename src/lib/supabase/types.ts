@@ -694,30 +694,75 @@ export type Database = {
           code: string
           created_at: string
           description: string | null
+          domain: string | null
           framework: string
           grade_band: string | null
+          grade_level: string | null
           id: string
+          source_url: string | null
           subject: string | null
         }
         Insert: {
           code: string
           created_at?: string
           description?: string | null
+          domain?: string | null
           framework: string
           grade_band?: string | null
+          grade_level?: string | null
           id?: string
+          source_url?: string | null
           subject?: string | null
         }
         Update: {
           code?: string
           created_at?: string
           description?: string | null
+          domain?: string | null
           framework?: string
           grade_band?: string | null
+          grade_level?: string | null
           id?: string
+          source_url?: string | null
           subject?: string | null
         }
         Relationships: []
+      }
+      lesson_plan_standards: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_plan_id: string
+          standard_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_plan_id: string
+          standard_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_plan_id?: string
+          standard_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_plan_standards_lesson_plan_id_fkey"
+            columns: ["lesson_plan_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_plan_standards_standard_id_fkey"
+            columns: ["standard_id"]
+            isOneToOne: false
+            referencedRelation: "curriculum_standards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       duolingo_tracker: {
         Row: {

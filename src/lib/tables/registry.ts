@@ -112,15 +112,29 @@ export const TABLES: TableSpec[] = [
     name: "curriculum_standards",
     label: "Curriculum Standards",
     group: "Curriculum",
-    description: "CCSS / NGSS / NCSS / CASEL standards library.",
+    description:
+      "CCSS Mathematics and ELA, K-8, plus Utah SEEd Science. Use /standards for filtered browsing.",
     columns: [
       { key: "code", label: "Code" },
       { key: "framework", label: "Framework", kind: "badge" },
-      { key: "subject", label: "Subject" },
-      { key: "grade_band", label: "Grade band" },
+      { key: "grade_level", label: "Grade" },
+      { key: "domain", label: "Domain" },
       { key: "description", label: "Description" },
     ],
     orderBy: { column: "code", ascending: true },
+  },
+  {
+    name: "lesson_plan_standards",
+    label: "Lesson Plan Standards",
+    group: "Planning",
+    description:
+      "Which standards each lesson plan addresses. Replaces the old text[] column, so coverage can be queried.",
+    columns: [
+      { key: "lesson_plan_id", label: "Lesson plan" },
+      { key: "standard_id", label: "Standard" },
+      { key: "created_at", label: "Linked", kind: "date" },
+    ],
+    orderBy: { column: "created_at", ascending: false },
   },
   {
     name: "curriculum_modules",
