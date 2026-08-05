@@ -208,6 +208,31 @@ export const TABLES: TableSpec[] = [
     ],
     orderBy: { column: "created_at", ascending: false },
   },
+  {
+    name: "attendance_summary",
+    label: "Attendance",
+    group: "Assessment",
+    description: "Per-term attendance totals, as published on report cards.",
+    columns: [
+      { key: "term", label: "Term", kind: "badge" },
+      { key: "present_days", label: "Present", kind: "number" },
+      { key: "total_days", label: "Total", kind: "number" },
+      { key: "attendance_pct", label: "Attendance %", kind: "number" },
+    ],
+    orderBy: { column: "attendance_pct", ascending: true },
+  },
+  {
+    name: "report_comments",
+    label: "Report Comments",
+    group: "Assessment",
+    description: "The teacher's narrative comment for each learner, per term.",
+    columns: [
+      { key: "term", label: "Term", kind: "badge" },
+      { key: "comment", label: "Comment" },
+      { key: "created_at", label: "Recorded", kind: "date" },
+    ],
+    orderBy: { column: "created_at", ascending: false },
+  },
 
   // -------------------------------------------------------------- Monitoring
   {

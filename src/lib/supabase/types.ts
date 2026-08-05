@@ -1,4 +1,3 @@
-// Regenerated from the live schema via the Supabase MCP `generate_typescript_types` tool.
 export type Json =
   | string
   | number
@@ -11,327 +10,10 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.15"
   }
   public: {
     Tables: {
-      // --- Curriculum resources & planner folders (migrations 0005-0006).
-      // Hand-added; fold into the generated block on the next full regen.
-      resource_categories: {
-        Row: {
-          id: string
-          moodle_category_id: number
-          name: string
-          grade_band: string | null
-          grade_level: string | null
-          course_count: number | null
-          sort_order: number
-          last_synced_at: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          moodle_category_id: number
-          name: string
-          grade_band?: string | null
-          grade_level?: string | null
-          course_count?: number | null
-          sort_order?: number
-          last_synced_at?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          moodle_category_id?: number
-          name?: string
-          grade_band?: string | null
-          grade_level?: string | null
-          course_count?: number | null
-          sort_order?: number
-          last_synced_at?: string | null
-          created_at?: string
-        }
-        Relationships: []
-      }
-      resource_courses: {
-        Row: {
-          id: string
-          moodle_course_id: number
-          category_id: string | null
-          fullname: string
-          shortname: string | null
-          subject: string | null
-          summary: string | null
-          visible: boolean
-          last_synced_at: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          moodle_course_id: number
-          category_id?: string | null
-          fullname: string
-          shortname?: string | null
-          subject?: string | null
-          summary?: string | null
-          visible?: boolean
-          last_synced_at?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          moodle_course_id?: number
-          category_id?: string | null
-          fullname?: string
-          shortname?: string | null
-          subject?: string | null
-          summary?: string | null
-          visible?: boolean
-          last_synced_at?: string | null
-          created_at?: string
-        }
-        Relationships: []
-      }
-      resource_collections: {
-        Row: {
-          id: string
-          source: string
-          drive_folder_id: string | null
-          parent_id: string | null
-          name: string
-          subject: string | null
-          grade_level: string | null
-          grade_band: string | null
-          module_name: string | null
-          depth: number
-          path: string | null
-          view_url: string | null
-          last_synced_at: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          source?: string
-          drive_folder_id?: string | null
-          parent_id?: string | null
-          name: string
-          subject?: string | null
-          grade_level?: string | null
-          grade_band?: string | null
-          module_name?: string | null
-          depth?: number
-          path?: string | null
-          view_url?: string | null
-          last_synced_at?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          source?: string
-          drive_folder_id?: string | null
-          parent_id?: string | null
-          name?: string
-          subject?: string | null
-          grade_level?: string | null
-          grade_band?: string | null
-          module_name?: string | null
-          depth?: number
-          path?: string | null
-          view_url?: string | null
-          last_synced_at?: string | null
-          created_at?: string
-        }
-        Relationships: []
-      }
-      resources: {
-        Row: {
-          id: string
-          course_id: string | null
-          collection_id: string | null
-          source: string
-          moodle_module_id: number | null
-          drive_file_id: string | null
-          name: string
-          kind: string
-          doc_role: string | null
-          mime_type: string | null
-          file_url: string | null
-          file_size: number | null
-          section_name: string | null
-          sort_order: number
-          ai_subject: string | null
-          ai_topics: string[]
-          ai_summary: string | null
-          ai_classified_at: string | null
-          last_synced_at: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          course_id?: string | null
-          collection_id?: string | null
-          source?: string
-          moodle_module_id?: number | null
-          drive_file_id?: string | null
-          name: string
-          kind?: string
-          doc_role?: string | null
-          mime_type?: string | null
-          file_url?: string | null
-          file_size?: number | null
-          section_name?: string | null
-          sort_order?: number
-          ai_subject?: string | null
-          ai_topics?: string[]
-          ai_summary?: string | null
-          ai_classified_at?: string | null
-          last_synced_at?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          course_id?: string | null
-          collection_id?: string | null
-          source?: string
-          moodle_module_id?: number | null
-          drive_file_id?: string | null
-          name?: string
-          kind?: string
-          doc_role?: string | null
-          mime_type?: string | null
-          file_url?: string | null
-          file_size?: number | null
-          section_name?: string | null
-          sort_order?: number
-          ai_subject?: string | null
-          ai_topics?: string[]
-          ai_summary?: string | null
-          ai_classified_at?: string | null
-          last_synced_at?: string | null
-          created_at?: string
-        }
-        Relationships: []
-      }
-      resource_sync_runs: {
-        Row: {
-          id: string
-          started_at: string
-          finished_at: string | null
-          status: string
-          categories_seen: number
-          courses_seen: number
-          resources_seen: number
-          error_message: string | null
-        }
-        Insert: {
-          id?: string
-          started_at?: string
-          finished_at?: string | null
-          status?: string
-          categories_seen?: number
-          courses_seen?: number
-          resources_seen?: number
-          error_message?: string | null
-        }
-        Update: {
-          id?: string
-          started_at?: string
-          finished_at?: string | null
-          status?: string
-          categories_seen?: number
-          courses_seen?: number
-          resources_seen?: number
-          error_message?: string | null
-        }
-        Relationships: []
-      }
-      planner_folders: {
-        Row: {
-          id: string
-          teacher_id: string | null
-          parent_id: string | null
-          name: string
-          colour: string | null
-          is_ai_generated: boolean
-          sort_order: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          teacher_id?: string | null
-          parent_id?: string | null
-          name: string
-          colour?: string | null
-          is_ai_generated?: boolean
-          sort_order?: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          teacher_id?: string | null
-          parent_id?: string | null
-          name?: string
-          colour?: string | null
-          is_ai_generated?: boolean
-          sort_order?: number
-          created_at?: string
-        }
-        Relationships: []
-      }
-      planner_folder_items: {
-        Row: {
-          id: string
-          folder_id: string
-          resource_id: string
-          note: string | null
-          sort_order: number
-          added_at: string
-        }
-        Insert: {
-          id?: string
-          folder_id: string
-          resource_id: string
-          note?: string | null
-          sort_order?: number
-          added_at?: string
-        }
-        Update: {
-          id?: string
-          folder_id?: string
-          resource_id?: string
-          note?: string | null
-          sort_order?: number
-          added_at?: string
-        }
-        Relationships: []
-      }
-      lesson_plan_resources: {
-        Row: {
-          id: string
-          lesson_plan_id: string
-          resource_id: string
-          role: string
-          sort_order: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          lesson_plan_id: string
-          resource_id: string
-          role?: string
-          sort_order?: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          lesson_plan_id?: string
-          resource_id?: string
-          role?: string
-          sort_order?: number
-          created_at?: string
-        }
-        Relationships: []
-      }
       academic_calendar: {
         Row: {
           created_at: string
@@ -579,6 +261,82 @@ export type Database = {
           },
         ]
       }
+      attendance_summary: {
+        Row: {
+          attendance_pct: number | null
+          created_at: string
+          id: string
+          present_days: number | null
+          student_id: string
+          term: string
+          total_days: number | null
+        }
+        Insert: {
+          attendance_pct?: number | null
+          created_at?: string
+          id?: string
+          present_days?: number | null
+          student_id: string
+          term: string
+          total_days?: number | null
+        }
+        Update: {
+          attendance_pct?: number | null
+          created_at?: string
+          id?: string
+          present_days?: number | null
+          student_id?: string
+          term?: string
+          total_days?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_summary_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          detail: Json | null
+          entity: string | null
+          entity_id: string | null
+          id: number
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json | null
+          entity?: string | null
+          entity_id?: string | null
+          id?: number
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json | null
+          entity?: string | null
+          entity_id?: string | null
+          id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_log_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       class_enrollment: {
         Row: {
           class_id: string
@@ -656,13 +414,52 @@ export type Database = {
           },
         ]
       }
+      curriculum_frameworks: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          parent_framework: string | null
+          primary_standard: string
+          source_url: string | null
+          state_anchor: string | null
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          parent_framework?: string | null
+          primary_standard: string
+          source_url?: string | null
+          state_anchor?: string | null
+          subject: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          parent_framework?: string | null
+          primary_standard?: string
+          source_url?: string | null
+          state_anchor?: string | null
+          subject?: string
+        }
+        Relationships: []
+      }
       curriculum_modules: {
         Row: {
           created_at: string
           grade_band: string | null
+          grade_level: string | null
           id: string
+          planned_days: number | null
           sequence_order: number | null
           source: string | null
+          source_url: string | null
           subject: string | null
           term: string | null
           title: string
@@ -670,9 +467,12 @@ export type Database = {
         Insert: {
           created_at?: string
           grade_band?: string | null
+          grade_level?: string | null
           id?: string
+          planned_days?: number | null
           sequence_order?: number | null
           source?: string | null
+          source_url?: string | null
           subject?: string | null
           term?: string | null
           title: string
@@ -680,12 +480,87 @@ export type Database = {
         Update: {
           created_at?: string
           grade_band?: string | null
+          grade_level?: string | null
           id?: string
+          planned_days?: number | null
           sequence_order?: number | null
           source?: string | null
+          source_url?: string | null
           subject?: string | null
           term?: string | null
           title?: string
+        }
+        Relationships: []
+      }
+      curriculum_programmes: {
+        Row: {
+          created_at: string
+          governing_standard: string | null
+          grades: string | null
+          id: string
+          is_daily: boolean
+          notes: string | null
+          programme: string
+          status: string
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          governing_standard?: string | null
+          grades?: string | null
+          id?: string
+          is_daily?: boolean
+          notes?: string | null
+          programme: string
+          status?: string
+          subject: string
+        }
+        Update: {
+          created_at?: string
+          governing_standard?: string | null
+          grades?: string | null
+          id?: string
+          is_daily?: boolean
+          notes?: string | null
+          programme?: string
+          status?: string
+          subject?: string
+        }
+        Relationships: []
+      }
+      curriculum_sources: {
+        Row: {
+          acquired: boolean
+          category: string
+          created_at: string
+          id: string
+          licence: string | null
+          name: string
+          priority: number | null
+          provides: string | null
+          url: string
+        }
+        Insert: {
+          acquired?: boolean
+          category: string
+          created_at?: string
+          id?: string
+          licence?: string | null
+          name: string
+          priority?: number | null
+          provides?: string | null
+          url: string
+        }
+        Update: {
+          acquired?: boolean
+          category?: string
+          created_at?: string
+          id?: string
+          licence?: string | null
+          name?: string
+          priority?: number | null
+          provides?: string | null
+          url?: string
         }
         Relationships: []
       }
@@ -727,42 +602,6 @@ export type Database = {
           subject?: string | null
         }
         Relationships: []
-      }
-      lesson_plan_standards: {
-        Row: {
-          created_at: string
-          id: string
-          lesson_plan_id: string
-          standard_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          lesson_plan_id: string
-          standard_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          lesson_plan_id?: string
-          standard_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "lesson_plan_standards_lesson_plan_id_fkey"
-            columns: ["lesson_plan_id"]
-            isOneToOne: false
-            referencedRelation: "lesson_plans"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "lesson_plan_standards_standard_id_fkey"
-            columns: ["standard_id"]
-            isOneToOne: false
-            referencedRelation: "curriculum_standards"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       duolingo_tracker: {
         Row: {
@@ -882,6 +721,84 @@ export type Database = {
           target_term?: string
         }
         Relationships: []
+      }
+      lesson_plan_resources: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_plan_id: string
+          resource_id: string
+          role: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_plan_id: string
+          resource_id: string
+          role?: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_plan_id?: string
+          resource_id?: string
+          role?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_plan_resources_lesson_plan_id_fkey"
+            columns: ["lesson_plan_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_plan_resources_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lesson_plan_standards: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_plan_id: string
+          standard_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_plan_id: string
+          standard_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_plan_id?: string
+          standard_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_plan_standards_lesson_plan_id_fkey"
+            columns: ["lesson_plan_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_plan_standards_standard_id_fkey"
+            columns: ["standard_id"]
+            isOneToOne: false
+            referencedRelation: "curriculum_standards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lesson_plans: {
         Row: {
@@ -1107,6 +1024,96 @@ export type Database = {
           },
         ]
       }
+      planner_folder_items: {
+        Row: {
+          added_at: string
+          folder_id: string
+          id: string
+          note: string | null
+          resource_id: string
+          sort_order: number
+        }
+        Insert: {
+          added_at?: string
+          folder_id: string
+          id?: string
+          note?: string | null
+          resource_id: string
+          sort_order?: number
+        }
+        Update: {
+          added_at?: string
+          folder_id?: string
+          id?: string
+          note?: string | null
+          resource_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "planner_folder_items_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "planner_folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "planner_folder_items_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      planner_folders: {
+        Row: {
+          colour: string | null
+          created_at: string
+          id: string
+          is_ai_generated: boolean
+          name: string
+          parent_id: string | null
+          sort_order: number
+          teacher_id: string | null
+        }
+        Insert: {
+          colour?: string | null
+          created_at?: string
+          id?: string
+          is_ai_generated?: boolean
+          name: string
+          parent_id?: string | null
+          sort_order?: number
+          teacher_id?: string | null
+        }
+        Update: {
+          colour?: string | null
+          created_at?: string
+          id?: string
+          is_ai_generated?: boolean
+          name?: string
+          parent_id?: string | null
+          sort_order?: number
+          teacher_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "planner_folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "planner_folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "planner_folders_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -1138,211 +1145,6 @@ export type Database = {
             columns: ["school_id"]
             isOneToOne: false
             referencedRelation: "schools"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      audit_log: {
-        Row: {
-          action: string
-          actor_id: string | null
-          created_at: string
-          detail: Json | null
-          entity: string | null
-          entity_id: string | null
-          id: number
-        }
-        Insert: {
-          action: string
-          actor_id?: string | null
-          created_at?: string
-          detail?: Json | null
-          entity?: string | null
-          entity_id?: string | null
-          id?: number
-        }
-        Update: {
-          action?: string
-          actor_id?: string | null
-          created_at?: string
-          detail?: Json | null
-          entity?: string | null
-          entity_id?: string | null
-          id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "audit_log_actor_id_fkey"
-            columns: ["actor_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      curriculum_programmes: {
-        Row: {
-          created_at: string
-          governing_standard: string | null
-          grades: string | null
-          id: string
-          is_daily: boolean
-          notes: string | null
-          programme: string
-          status: string
-          subject: string
-        }
-        Insert: {
-          created_at?: string
-          governing_standard?: string | null
-          grades?: string | null
-          id?: string
-          is_daily?: boolean
-          notes?: string | null
-          programme: string
-          status?: string
-          subject: string
-        }
-        Update: {
-          created_at?: string
-          governing_standard?: string | null
-          grades?: string | null
-          id?: string
-          is_daily?: boolean
-          notes?: string | null
-          programme?: string
-          status?: string
-          subject?: string
-        }
-        Relationships: []
-      }
-      curriculum_sources: {
-        Row: {
-          acquired: boolean
-          category: string
-          created_at: string
-          id: string
-          licence: string | null
-          name: string
-          priority: number | null
-          provides: string | null
-          url: string
-        }
-        Insert: {
-          acquired?: boolean
-          category: string
-          created_at?: string
-          id?: string
-          licence?: string | null
-          name: string
-          priority?: number | null
-          provides?: string | null
-          url: string
-        }
-        Update: {
-          acquired?: boolean
-          category?: string
-          created_at?: string
-          id?: string
-          licence?: string | null
-          name?: string
-          priority?: number | null
-          provides?: string | null
-          url?: string
-        }
-        Relationships: []
-      }
-      curriculum_frameworks: {
-        Row: {
-          created_at: string
-          id: string
-          is_active: boolean
-          notes: string | null
-          parent_framework: string | null
-          primary_standard: string
-          source_url: string | null
-          state_anchor: string | null
-          subject: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          notes?: string | null
-          parent_framework?: string | null
-          primary_standard: string
-          source_url?: string | null
-          state_anchor?: string | null
-          subject: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          notes?: string | null
-          parent_framework?: string | null
-          primary_standard?: string
-          source_url?: string | null
-          state_anchor?: string | null
-          subject?: string
-        }
-        Relationships: []
-      }
-      schools: {
-        Row: {
-          code: string | null
-          created_at: string
-          id: string
-          is_active: boolean
-          name: string
-          timezone: string
-        }
-        Insert: {
-          code?: string | null
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          name: string
-          timezone?: string
-        }
-        Update: {
-          code?: string | null
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          name?: string
-          timezone?: string
-        }
-        Relationships: []
-      }
-      system_settings: {
-        Row: {
-          description: string | null
-          key: string
-          updated_at: string
-          updated_by: string | null
-          value: Json
-        }
-        Insert: {
-          description?: string | null
-          key: string
-          updated_at?: string
-          updated_by?: string | null
-          value: Json
-        }
-        Update: {
-          description?: string | null
-          key?: string
-          updated_at?: string
-          updated_by?: string | null
-          value?: Json
-        }
-        Relationships: [
-          {
-            foreignKeyName: "system_settings_updated_by_fkey"
-            columns: ["updated_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1387,6 +1189,334 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      report_comments: {
+        Row: {
+          author_teacher_id: string | null
+          comment: string
+          created_at: string
+          id: string
+          student_id: string
+          term: string
+        }
+        Insert: {
+          author_teacher_id?: string | null
+          comment: string
+          created_at?: string
+          id?: string
+          student_id: string
+          term: string
+        }
+        Update: {
+          author_teacher_id?: string | null
+          comment?: string
+          created_at?: string
+          id?: string
+          student_id?: string
+          term?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_comments_author_teacher_id_fkey"
+            columns: ["author_teacher_id"]
+            isOneToOne: false
+            referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_comments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_categories: {
+        Row: {
+          course_count: number | null
+          created_at: string
+          grade_band: string | null
+          grade_level: string | null
+          id: string
+          last_synced_at: string | null
+          moodle_category_id: number
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          course_count?: number | null
+          created_at?: string
+          grade_band?: string | null
+          grade_level?: string | null
+          id?: string
+          last_synced_at?: string | null
+          moodle_category_id: number
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          course_count?: number | null
+          created_at?: string
+          grade_band?: string | null
+          grade_level?: string | null
+          id?: string
+          last_synced_at?: string | null
+          moodle_category_id?: number
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      resource_collections: {
+        Row: {
+          created_at: string
+          depth: number
+          drive_folder_id: string | null
+          grade_band: string | null
+          grade_level: string | null
+          id: string
+          last_synced_at: string | null
+          module_name: string | null
+          name: string
+          parent_id: string | null
+          path: string | null
+          source: string
+          subject: string | null
+          view_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          depth?: number
+          drive_folder_id?: string | null
+          grade_band?: string | null
+          grade_level?: string | null
+          id?: string
+          last_synced_at?: string | null
+          module_name?: string | null
+          name: string
+          parent_id?: string | null
+          path?: string | null
+          source?: string
+          subject?: string | null
+          view_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          depth?: number
+          drive_folder_id?: string | null
+          grade_band?: string | null
+          grade_level?: string | null
+          id?: string
+          last_synced_at?: string | null
+          module_name?: string | null
+          name?: string
+          parent_id?: string | null
+          path?: string | null
+          source?: string
+          subject?: string | null
+          view_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_collections_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "resource_collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_courses: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          fullname: string
+          id: string
+          last_synced_at: string | null
+          moodle_course_id: number
+          shortname: string | null
+          subject: string | null
+          summary: string | null
+          visible: boolean
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          fullname: string
+          id?: string
+          last_synced_at?: string | null
+          moodle_course_id: number
+          shortname?: string | null
+          subject?: string | null
+          summary?: string | null
+          visible?: boolean
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          fullname?: string
+          id?: string
+          last_synced_at?: string | null
+          moodle_course_id?: number
+          shortname?: string | null
+          subject?: string | null
+          summary?: string | null
+          visible?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_courses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "resource_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_sync_runs: {
+        Row: {
+          categories_seen: number
+          courses_seen: number
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          resources_seen: number
+          started_at: string
+          status: string
+        }
+        Insert: {
+          categories_seen?: number
+          courses_seen?: number
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          resources_seen?: number
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          categories_seen?: number
+          courses_seen?: number
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          resources_seen?: number
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      resources: {
+        Row: {
+          ai_classified_at: string | null
+          ai_subject: string | null
+          ai_summary: string | null
+          ai_topics: string[]
+          collection_id: string | null
+          course_id: string | null
+          created_at: string
+          doc_role: string | null
+          drive_file_id: string | null
+          file_size: number | null
+          file_url: string | null
+          id: string
+          kind: string
+          last_synced_at: string | null
+          mime_type: string | null
+          moodle_module_id: number | null
+          name: string
+          section_name: string | null
+          sort_order: number
+          source: string
+        }
+        Insert: {
+          ai_classified_at?: string | null
+          ai_subject?: string | null
+          ai_summary?: string | null
+          ai_topics?: string[]
+          collection_id?: string | null
+          course_id?: string | null
+          created_at?: string
+          doc_role?: string | null
+          drive_file_id?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          kind?: string
+          last_synced_at?: string | null
+          mime_type?: string | null
+          moodle_module_id?: number | null
+          name: string
+          section_name?: string | null
+          sort_order?: number
+          source?: string
+        }
+        Update: {
+          ai_classified_at?: string | null
+          ai_subject?: string | null
+          ai_summary?: string | null
+          ai_topics?: string[]
+          collection_id?: string | null
+          course_id?: string | null
+          created_at?: string
+          doc_role?: string | null
+          drive_file_id?: string | null
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          kind?: string
+          last_synced_at?: string | null
+          mime_type?: string | null
+          moodle_module_id?: number | null
+          name?: string
+          section_name?: string | null
+          sort_order?: number
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resources_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "resource_collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resources_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "resource_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schools: {
+        Row: {
+          code: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          timezone: string
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          timezone?: string
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          timezone?: string
+        }
+        Relationships: []
       }
       students: {
         Row: {
@@ -1452,6 +1582,38 @@ export type Database = {
             columns: ["teacher_id"]
             isOneToOne: false
             referencedRelation: "teachers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_settings: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
