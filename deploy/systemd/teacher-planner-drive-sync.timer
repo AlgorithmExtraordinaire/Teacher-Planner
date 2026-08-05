@@ -1,0 +1,14 @@
+[Unit]
+Description=Teacher Planner - nightly curriculum Drive sync
+
+[Timer]
+# 02:00 Namibian time. The droplet runs on UTC, so the zone is stated
+# explicitly rather than left to the host: if the host timezone is ever
+# changed the school's overnight window must not move with it.
+OnCalendar=*-*-* 02:00:00 Africa/Windhoek
+RandomizedDelaySec=900
+Persistent=true
+Unit=teacher-planner-drive-sync.service
+
+[Install]
+WantedBy=timers.target

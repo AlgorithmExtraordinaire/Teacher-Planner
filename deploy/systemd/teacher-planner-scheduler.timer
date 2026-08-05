@@ -1,0 +1,17 @@
+[Unit]
+Description=Teacher Planner - hourly workflow scheduler
+
+[Timer]
+# Hourly, not daily. Every workflow already carries its own cadence and
+# /api/cron/workflows skips anything not yet due, so this is a poll, not a
+# schedule. Polling hourly means a daily workflow that was missed because the
+# droplet was down recovers within the hour instead of waiting a full day.
+OnCalendar=hourly
+# Spread the load off the exact top of the hour.
+RandomizedDelaySec=180
+# Catch up on a run missed while the machine was off.
+Persistent=true
+Unit=teacher-planner-scheduler.service
+
+[Install]
+WantedBy=timers.target

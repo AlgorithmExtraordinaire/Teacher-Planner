@@ -1,0 +1,19 @@
+[Unit]
+Description=Teacher Planner - run due workflows
+Documentation=https://github.com/AlgorithmExtraordinaire/Teacher-Planner
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/teacher-planner
+ExecStart=/opt/teacher-planner/scripts/run_scheduler.sh
+TimeoutStartSec=600
+
+# The secret is read from .env by the wrapper, never placed in the unit,
+# so it does not appear in `systemctl cat` or journal metadata.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/teacher-planner

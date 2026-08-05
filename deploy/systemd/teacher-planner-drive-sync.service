@@ -1,0 +1,21 @@
+[Unit]
+Description=Teacher Planner - sync curriculum Google Drive
+Documentation=https://github.com/AlgorithmExtraordinaire/Teacher-Planner
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/teacher-planner
+ExecStart=/opt/teacher-planner/scripts/run_drive_sync.sh
+# A full crawl of the curriculum Drive walks a few thousand files with
+# backoff on Google's rate limits; an hour is generous but finite.
+TimeoutStartSec=3600
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/teacher-planner
+# Read-only access to the service-account key, which lives outside the repo.
+ReadOnlyPaths=/etc/teacher-planner
