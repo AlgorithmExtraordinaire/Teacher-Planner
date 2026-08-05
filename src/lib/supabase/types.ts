@@ -899,7 +899,6 @@ export type Database = {
           materials: string | null
           objective: string | null
           reflection: string | null
-          standards: string[]
           status: string
           teacher_id: string | null
           tier: string
@@ -923,7 +922,6 @@ export type Database = {
           materials?: string | null
           objective?: string | null
           reflection?: string | null
-          standards?: string[]
           status?: string
           teacher_id?: string | null
           tier: string
@@ -947,7 +945,6 @@ export type Database = {
           materials?: string | null
           objective?: string | null
           reflection?: string | null
-          standards?: string[]
           status?: string
           teacher_id?: string | null
           tier?: string

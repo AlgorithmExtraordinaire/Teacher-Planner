@@ -97,6 +97,23 @@ export function LessonPlanForm({ classes }: { classes: ClassOption[] }) {
         <textarea name="differentiation" rows={2} className={inputClass} />
       </Field>
 
+      <Field label="Standards addressed">
+        <input
+          name="standards"
+          placeholder="e.g. 4.NF.A.1, RL.4.2"
+          spellCheck={false}
+          className={`${inputClass} font-mono`}
+        />
+        <p className="text-xs text-muted">
+          Comma-separated codes, checked against the standards library on save.
+          An unrecognised code is rejected rather than stored — browse{" "}
+          <a href="/standards" className="underline">
+            Curriculum Standards
+          </a>{" "}
+          to find them.
+        </p>
+      </Field>
+
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
 
       <button

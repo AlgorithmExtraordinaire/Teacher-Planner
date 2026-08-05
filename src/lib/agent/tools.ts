@@ -47,6 +47,13 @@ const READABLE = [
   "planner_folders",
   "planner_folder_items",
   "lesson_plan_resources",
+  // Curriculum alignment. Without these the assistant can quote a standard
+  // but cannot say which framework governs it, what programme teaches it, or
+  // whether a lesson plan has covered it.
+  "curriculum_frameworks",
+  "curriculum_programmes",
+  "curriculum_sources",
+  "lesson_plan_standards",
 ] as const;
 
 const MAX_ROWS = 100;
