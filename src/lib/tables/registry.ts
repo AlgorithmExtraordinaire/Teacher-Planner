@@ -408,6 +408,36 @@ export const TABLES: TableSpec[] = [
   },
 
   {
+    name: "curriculum_programmes",
+    label: "Programmes",
+    group: "Curriculum",
+    description:
+      "Which programme SCA runs for each subject, and against which standard.",
+    columns: [
+      { key: "subject", label: "Subject" },
+      { key: "programme", label: "Programme" },
+      { key: "grades", label: "Grades", kind: "badge" },
+      { key: "status", label: "Status", kind: "badge" },
+      { key: "is_daily", label: "Daily", kind: "bool" },
+    ],
+    orderBy: { column: "subject", ascending: true },
+  },
+  {
+    name: "curriculum_sources",
+    label: "Source Library",
+    group: "Curriculum",
+    description:
+      "Free, openly-licensed source for every programme. The acquisition list.",
+    columns: [
+      { key: "priority", label: "Priority", kind: "number" },
+      { key: "name", label: "Source" },
+      { key: "category", label: "Category", kind: "badge" },
+      { key: "provides", label: "Provides" },
+      { key: "acquired", label: "Filed", kind: "bool" },
+    ],
+    orderBy: { column: "priority", ascending: true },
+  },
+  {
     name: "curriculum_frameworks",
     label: "Standards Frameworks",
     group: "Curriculum",

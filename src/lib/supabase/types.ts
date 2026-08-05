@@ -1138,6 +1138,78 @@ export type Database = {
           },
         ]
       }
+      curriculum_programmes: {
+        Row: {
+          created_at: string
+          governing_standard: string | null
+          grades: string | null
+          id: string
+          is_daily: boolean
+          notes: string | null
+          programme: string
+          status: string
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          governing_standard?: string | null
+          grades?: string | null
+          id?: string
+          is_daily?: boolean
+          notes?: string | null
+          programme: string
+          status?: string
+          subject: string
+        }
+        Update: {
+          created_at?: string
+          governing_standard?: string | null
+          grades?: string | null
+          id?: string
+          is_daily?: boolean
+          notes?: string | null
+          programme?: string
+          status?: string
+          subject?: string
+        }
+        Relationships: []
+      }
+      curriculum_sources: {
+        Row: {
+          acquired: boolean
+          category: string
+          created_at: string
+          id: string
+          licence: string | null
+          name: string
+          priority: number | null
+          provides: string | null
+          url: string
+        }
+        Insert: {
+          acquired?: boolean
+          category: string
+          created_at?: string
+          id?: string
+          licence?: string | null
+          name: string
+          priority?: number | null
+          provides?: string | null
+          url: string
+        }
+        Update: {
+          acquired?: boolean
+          category?: string
+          created_at?: string
+          id?: string
+          licence?: string | null
+          name?: string
+          priority?: number | null
+          provides?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       curriculum_frameworks: {
         Row: {
           created_at: string
