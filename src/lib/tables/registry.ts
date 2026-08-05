@@ -407,6 +407,21 @@ export const TABLES: TableSpec[] = [
     orderBy: { column: "created_at", ascending: false },
   },
 
+  {
+    name: "curriculum_frameworks",
+    label: "Standards Frameworks",
+    group: "Curriculum",
+    description:
+      "Which standards framework governs each subject. CCSS for Maths and ELA; Utah Core elsewhere.",
+    columns: [
+      { key: "subject", label: "Subject" },
+      { key: "primary_standard", label: "Primary standard" },
+      { key: "parent_framework", label: "Parent framework", kind: "badge" },
+      { key: "notes", label: "Notes" },
+    ],
+    orderBy: { column: "subject", ascending: true },
+  },
+
   // ---------------------------------------------------------------- Platform
   // Superadmin-scoped. These are listed for completeness — RLS still decides
   // what any given account can actually read, so an admin opening `audit_log`

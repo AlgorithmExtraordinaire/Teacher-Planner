@@ -1138,6 +1138,42 @@ export type Database = {
           },
         ]
       }
+      curriculum_frameworks: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          parent_framework: string | null
+          primary_standard: string
+          source_url: string | null
+          state_anchor: string | null
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          parent_framework?: string | null
+          primary_standard: string
+          source_url?: string | null
+          state_anchor?: string | null
+          subject: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          parent_framework?: string | null
+          primary_standard?: string
+          source_url?: string | null
+          state_anchor?: string | null
+          subject?: string
+        }
+        Relationships: []
+      }
       schools: {
         Row: {
           code: string | null
