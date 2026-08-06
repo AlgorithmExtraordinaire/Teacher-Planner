@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "kb:update": "node scripts/update_kb.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.14.0",
@@ -18,10 +19,12 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@notionhq/client": "^5.24.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
     "tailwindcss": "^4",
