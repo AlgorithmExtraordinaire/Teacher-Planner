@@ -83,12 +83,11 @@ export default async function StandardsPage({
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <KpiCard label="Standards in library" value={total} />
+        <KpiCard label="Standards in library" value={total} tone="accent" />
         <KpiCard label="Frameworks" value={frameworkOptions.length} />
         <KpiCard
           label="Showing"
           value={`${standards?.length ?? 0} of ${total}`}
-          tone="main"
         />
       </div>
 
@@ -97,7 +96,7 @@ export default async function StandardsPage({
       <Card>
         <form method="get" className="flex flex-wrap items-end gap-3">
           <div className="flex min-w-[220px] flex-1 flex-col gap-1">
-            <label htmlFor="q" className="text-xs font-medium text-muted">
+            <label htmlFor="q" className="field__label">
               Search code or description
             </label>
             <input
@@ -105,29 +104,19 @@ export default async function StandardsPage({
               name="q"
               defaultValue={q ?? ""}
               placeholder="e.g. 4.NF or fractions"
-              className="rounded-[var(--radius-btn)] px-3 py-2 text-sm"
-              style={{
-                border: "1px solid var(--border-color)",
-                background: "var(--bg-surface)",
-                color: "var(--text-main)",
-              }}
+              className="input"
             />
           </div>
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="framework" className="text-xs font-medium text-muted">
+            <label htmlFor="framework" className="field__label">
               Framework
             </label>
             <select
               id="framework"
               name="framework"
               defaultValue={framework ?? ""}
-              className="rounded-[var(--radius-btn)] px-3 py-2 text-sm"
-              style={{
-                border: "1px solid var(--border-color)",
-                background: "var(--bg-surface)",
-                color: "var(--text-main)",
-              }}
+              className="select"
             >
               <option value="">All frameworks</option>
               {frameworkOptions.map((f) => (
@@ -139,19 +128,14 @@ export default async function StandardsPage({
           </div>
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="grade" className="text-xs font-medium text-muted">
+            <label htmlFor="grade" className="field__label">
               Grade
             </label>
             <select
               id="grade"
               name="grade"
               defaultValue={grade ?? ""}
-              className="rounded-[var(--radius-btn)] px-3 py-2 text-sm"
-              style={{
-                border: "1px solid var(--border-color)",
-                background: "var(--bg-surface)",
-                color: "var(--text-main)",
-              }}
+              className="select"
             >
               <option value="">All grades</option>
               {gradeOptions.map((g) => (
@@ -166,7 +150,7 @@ export default async function StandardsPage({
             Apply
           </button>
           {(framework || grade || q) && (
-            <Link href="/standards" className="btn btn-ghost">
+            <Link href="/standards" className="btn-ghost">
               Clear
             </Link>
           )}
@@ -176,13 +160,7 @@ export default async function StandardsPage({
       {!standards || standards.length === 0 ? (
         <EmptyState message="No standards match those filters." />
       ) : (
-        <div
-          className="overflow-x-auto rounded-[var(--radius-card)]"
-          style={{
-            border: "var(--border-width) solid var(--border-color)",
-            background: "var(--bg-surface)",
-          }}
-        >
+        <div className="table-wrap">
           <table className="data-table" style={{ minWidth: 760 }}>
             <thead>
               <tr>
@@ -196,7 +174,7 @@ export default async function StandardsPage({
             <tbody>
               {standards.map((s) => (
                 <tr key={s.id}>
-                  <td className="whitespace-nowrap font-mono text-xs">{s.code}</td>
+                  <td className="cell-num whitespace-nowrap">{s.code}</td>
                   <td>
                     <Badge value={s.framework} />
                   </td>
@@ -212,17 +190,17 @@ export default async function StandardsPage({
 
       {lastPage > 1 && (
         <div className="flex items-center justify-between gap-4 text-sm">
-          <span style={{ color: "var(--text-muted)" }}>
+          <span className="font-mono text-[11px] uppercase tracking-[0.06em] text-muted">
             Page {pageNum} of {lastPage}
           </span>
           <div className="flex gap-2">
             {pageNum > 1 && (
-              <Link className="btn btn-ghost" href={link({ page: String(pageNum - 1) })}>
+              <Link className="btn-ghost" href={link({ page: String(pageNum - 1) })}>
                 Previous
               </Link>
             )}
             {pageNum < lastPage && (
-              <Link className="btn btn-ghost" href={link({ page: String(pageNum + 1) })}>
+              <Link className="btn-ghost" href={link({ page: String(pageNum + 1) })}>
                 Next
               </Link>
             )}

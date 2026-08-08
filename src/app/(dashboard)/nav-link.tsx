@@ -6,27 +6,29 @@ import { usePathname } from "next/navigation";
 /**
  * Sidebar link.
  *
- * Colours come from --sidebar-* rather than the general text tokens, because
- * the sidebar is dark in two themes and light in one. Active state uses
- * --sidebar-active, which each theme sets to something legible on its own
- * sidebar: gold on navy, deep sage on off-white, cyan on near-black.
+ * The active state is set with `aria-current="page"` and styled from that
+ * attribute in globals.css, so the accessible state and the visible state
+ * are the same fact — they cannot disagree. It carries an amber label, a
+ * tinted ground and an inset left rule, so the current page is identifiable
+ * without relying on colour alone.
  */
 export function NavLink({ href, label }: { href: string; label: string }) {
   const pathname = usePathname();
+
+  // `/dashboard` must match exactly. Every other route is a prefix match so
+  // that a detail page (e.g. /agent/<id>) still lights up its section, but
+  // the boundary is checked to stop /resources highlighting for
+  // /resources-archive.
   const active =
     href === "/dashboard"
       ? pathname === "/dashboard"
-      : pathname.startsWith(href);
+      : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      style={{
-        color: active ? "var(--sidebar-active)" : "var(--sidebar-fg)",
-        opacity: active ? 1 : 0.85,
-      }}
-      className="text-sm font-medium no-underline transition-opacity hover:opacity-100"
+      className="side__link"
     >
       {label}
     </Link>

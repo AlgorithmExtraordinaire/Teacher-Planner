@@ -115,7 +115,7 @@ export function AgentChat({
 
   return (
     <div className="flex h-[calc(100vh-13rem)] flex-col">
-      <div className="flex-1 space-y-4 overflow-y-auto rounded-lg border border-line bg-white p-5">
+      <div className="flex-1 space-y-4 overflow-y-auto rounded-lg border border-line bg-surface p-5">
         {turns.length === 0 && (
           <div className="py-12 text-center">
             <p className="text-sm font-medium text-ink">
@@ -135,8 +135,8 @@ export function AgentChat({
             <div
               className={
                 turn.role === "user"
-                  ? "max-w-[80%] rounded-lg bg-navy px-4 py-2.5 text-sm text-white"
-                  : "max-w-[85%] rounded-lg bg-[#f7f9fc] px-4 py-2.5 text-sm text-body"
+                  ? "max-w-[80%] rounded-[var(--radius-btn)] bg-recessed px-4 py-2.5 text-sm text-main shadow-[inset_2px_0_0_var(--amber)]"
+                  : "max-w-[85%] rounded-lg bg-recessed px-4 py-2.5 text-sm text-body"
               }
             >
               {turn.role === "assistant" && turn.tools && turn.tools.length > 0 && (
@@ -154,7 +154,7 @@ export function AgentChat({
 
         {activeTool && (
           <div className="flex">
-            <div className="rounded-lg bg-[#f7f9fc] px-4 py-2.5 text-sm text-body">
+            <div className="rounded-lg bg-recessed px-4 py-2.5 text-sm text-body">
               <span className="inline-block animate-pulse">{activeTool}…</span>
             </div>
           </div>
@@ -162,7 +162,7 @@ export function AgentChat({
 
         {busy && !activeTool && turns[turns.length - 1]?.role === "user" && (
           <div className="flex">
-            <div className="rounded-lg bg-[#f7f9fc] px-4 py-2.5 text-sm text-body">
+            <div className="rounded-lg bg-recessed px-4 py-2.5 text-sm text-body">
               <span className="animate-pulse">Thinking…</span>
             </div>
           </div>
@@ -172,7 +172,7 @@ export function AgentChat({
       </div>
 
       {error && (
-        <p className="mt-2 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="notice notice--danger mt-2">
           {error}
         </p>
       )}
@@ -194,7 +194,7 @@ export function AgentChat({
         <button
           onClick={send}
           disabled={busy || !input.trim()}
-          className="h-fit self-end rounded-md bg-crimson px-4 py-2.5 text-sm font-medium text-white hover:bg-crimson-hover disabled:opacity-50"
+          className="btn-primary h-fit self-end"
         >
           Send
         </button>

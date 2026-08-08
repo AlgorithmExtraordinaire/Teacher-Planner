@@ -76,7 +76,7 @@ export default async function PlatformSettingsPage() {
         {schools && schools.length > 0 ? (
           <Card className="p-0">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-line bg-[#f7f9fc]">
+              <thead className="border-b border-line bg-recessed">
                 <tr>
                   <th className="px-4 py-2.5 font-medium text-body">
                     Name
@@ -127,7 +127,7 @@ export default async function PlatformSettingsPage() {
           <Card className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full min-w-max text-left text-sm">
-                <thead className="border-b border-line bg-[#f7f9fc]">
+                <thead className="border-b border-line bg-recessed">
                   <tr>
                     <th className="px-4 py-2.5 font-medium text-body">
                       When

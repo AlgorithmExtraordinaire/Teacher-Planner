@@ -34,12 +34,12 @@ export default async function TablesIndexPage() {
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {tables.map((t) => (
                 <Link key={t.name} href={`/tables/${t.name}`}>
-                  <Card className="h-full transition hover:border-navy">
+                  <Card className="h-full transition hover:border-line-strong">
                     <div className="flex items-start justify-between gap-3">
                       <p className="text-sm font-medium text-ink">
                         {t.label}
                       </p>
-                      <span className="shrink-0 rounded-md bg-[#f1f4f8] px-2 py-0.5 text-xs font-medium tabular-nums text-body">
+                      <span className="shrink-0 rounded-md bg-recessed px-2 py-0.5 text-xs font-medium tabular-nums text-body">
                         {countMap.get(t.name)}
                       </span>
                     </div>

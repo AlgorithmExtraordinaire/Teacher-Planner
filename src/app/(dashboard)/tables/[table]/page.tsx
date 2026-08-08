@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { PageHeader, EmptyState, Card } from "@/components/ui";
+import { PageHeader, EmptyState, Notice } from "@/components/ui";
 import { formatCell } from "@/components/cell";
 import { getTable } from "@/lib/tables/registry";
 
@@ -52,16 +52,16 @@ export default async function TableBrowserPage({
       />
 
       {error ? (
-        <Card className="border-red-200 bg-red-50 text-sm text-red-700">
+        <Notice tone="danger">
           Could not load this table: {error.message}
-        </Card>
+        </Notice>
       ) : rows.length === 0 ? (
         <EmptyState message="No rows yet." />
       ) : (
         <>
-          <div className="overflow-x-auto rounded-lg border border-line bg-white shadow-sm">
+          <div className="overflow-x-auto rounded-lg border border-line bg-surface shadow-sm">
             <table className="w-full min-w-max text-left text-sm">
-              <thead className="border-b border-line bg-[#f7f9fc]">
+              <thead className="border-b border-line bg-recessed">
                 <tr>
                   {spec.columns.map((c) => (
                     <th
@@ -75,7 +75,7 @@ export default async function TableBrowserPage({
               </thead>
               <tbody className="divide-y divide-line">
                 {rows.map((row, i) => (
-                  <tr key={i} className="hover:bg-[#f7f9fc]">
+                  <tr key={i} className="hover:bg-recessed">
                     {spec.columns.map((c) => (
                       <td key={c.key} className="px-4 py-2.5 text-body">
                         {formatCell(row[c.key], c.kind)}
@@ -96,7 +96,7 @@ export default async function TableBrowserPage({
                 {pageNum > 1 && (
                   <Link
                     href={`/tables/${spec.name}?page=${pageNum - 1}`}
-                    className="rounded-md border border-line px-3 py-1.5 font-medium text-body hover:bg-[#f1f4f8]"
+                    className="rounded-md border border-line px-3 py-1.5 font-medium text-body hover:bg-recessed"
                   >
                     Previous
                   </Link>
@@ -104,7 +104,7 @@ export default async function TableBrowserPage({
                 {pageNum < lastPage && (
                   <Link
                     href={`/tables/${spec.name}?page=${pageNum + 1}`}
-                    className="rounded-md border border-line px-3 py-1.5 font-medium text-body hover:bg-[#f1f4f8]"
+                    className="rounded-md border border-line px-3 py-1.5 font-medium text-body hover:bg-recessed"
                   >
                     Next
                   </Link>

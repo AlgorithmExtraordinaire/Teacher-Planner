@@ -1,18 +1,47 @@
+/**
+ * Shared UI primitives.
+ *
+ * Every visual decision resolves to a class in globals.css rather than an
+ * inline colour, so the template is applied in one place and these
+ * components cannot drift from it. Pages that already use these primitives
+ * (which is most of them) inherit the design system without individual
+ * edits.
+ */
+
+/**
+ * Page heading. The title is the display serif; the optional eyebrow is the
+ * template's mono micro-label, which is how a section announces itself
+ * before the eye reaches the heading.
+ */
 export function PageHeader({
   title,
   description,
+  eyebrow,
+  actions,
 }: {
   title: string;
   description?: string;
+  eyebrow?: string;
+  actions?: React.ReactNode;
 }) {
   return (
-    <div className="mb-6">
-      <h1 className="text-xl font-semibold tracking-tight text-main">{title}</h1>
-      {description && (
-        <p className="mt-1 max-w-3xl text-sm text-muted">{description}</p>
-      )}
+    <div className="page-head flex flex-wrap items-start justify-between gap-4">
+      <div>
+        {eyebrow && (
+          <p className="eyebrow eyebrow--rule mb-3">{eyebrow}</p>
+        )}
+        <h1 className="page-head__title">{title}</h1>
+        {description && <p className="page-head__desc">{description}</p>}
+      </div>
+      {actions && <div className="flex shrink-0 gap-3">{actions}</div>}
     </div>
   );
+}
+
+/** A section label inside a page — mono, so it does not compete with the
+ *  serif page title above it. */
+export function SectionLabel({ children }: { children: React.ReactNode }) {
+  return <h2 className="section-label">{children}</h2>;
 }
 
 export function Card({
@@ -22,45 +51,98 @@ export function Card({
   children: React.ReactNode;
   className?: string;
 }) {
-  // `.card` is defined in globals.css so hand-written and Tailwind styles
-  // share one definition of what a surface looks like.
   return <div className={`card ${className}`}>{children}</div>;
 }
 
-const KPI_TONES = {
-  navy: "text-navy",
-  crimson: "text-crimson",
-  gold: "text-gold",
-  main: "text-main",
-} as const;
+/**
+ * Panel with a ruled header — the template's dashboard block. Used where a
+ * card needs a title and an action on the same line.
+ */
+export function Panel({
+  title,
+  meta,
+  actions,
+  children,
+  raised = false,
+  className = "",
+}: {
+  title?: React.ReactNode;
+  meta?: React.ReactNode;
+  actions?: React.ReactNode;
+  children: React.ReactNode;
+  raised?: boolean;
+  className?: string;
+}) {
+  return (
+    <section className={`panel ${raised ? "panel--raised" : ""} ${className}`}>
+      {(title || actions) && (
+        <div className="panel__head">
+          <div>
+            {title && <h2 className="panel__title">{title}</h2>}
+            {meta && (
+              <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.06em] text-muted">
+                {meta}
+              </p>
+            )}
+          </div>
+          {actions && (
+            <div className="flex flex-wrap items-center gap-2">{actions}</div>
+          )}
+        </div>
+      )}
+      {children}
+    </section>
+  );
+}
 
 /**
- * Metric tile: muted label, large figure in a tone that says whether it needs
- * attention. Gold and crimson are reserved for figures that do.
+ * Metric tile.
+ *
+ * `tone` says what the figure means, not what colour to paint it:
+ *   accent — the figure the reader came for, set in italic serif amber
+ *   danger — a figure that needs a decision
+ *   neutral — context
+ *
+ * Direction is carried by `note` + `trend` so a movement is never conveyed
+ * by colour alone; the note text says which way it went.
  */
 export function KpiCard({
   label,
   value,
-  tone = "navy",
+  tone = "neutral",
   note,
+  trend,
 }: {
   label: string;
   value: string | number;
-  tone?: keyof typeof KPI_TONES;
+  tone?: "neutral" | "accent" | "danger";
   note?: string;
+  trend?: "up" | "down";
 }) {
+  const valueClass =
+    tone === "accent"
+      ? "kpi__value kpi__value--accent"
+      : tone === "danger"
+        ? "kpi__value kpi__value--danger"
+        : "kpi__value";
+
+  const noteClass =
+    trend === "up"
+      ? "kpi__note kpi__note--up"
+      : trend === "down"
+        ? "kpi__note kpi__note--down"
+        : "kpi__note";
+
   return (
-    <div className="card">
-      <h3 className="text-sm text-muted">{label}</h3>
-      <p className={`mt-1 text-3xl font-bold tabular-nums ${KPI_TONES[tone]}`}>
-        {value}
-      </p>
-      {note && <p className="mt-1 text-xs text-muted">{note}</p>}
+    <div className="kpi">
+      <h3 className="kpi__label">{label}</h3>
+      <p className={valueClass}>{value}</p>
+      {note && <p className={noteClass}>{note}</p>}
     </div>
   );
 }
 
-/** Retained for pages that use the simpler tile. */
+/** Retained for pages that only need a label and a figure. */
 export function StatTile({
   label,
   value,
@@ -68,38 +150,49 @@ export function StatTile({
   label: string;
   value: string | number;
 }) {
-  return <KpiCard label={label} value={value} tone="navy" />;
+  return <KpiCard label={label} value={value} />;
 }
 
 export function EmptyState({ message }: { message: string }) {
-  return (
-    <div className="rounded-[var(--radius-sm)] border border-dashed border-line bg-white px-5 py-8 text-center text-sm text-muted">
-      {message}
-    </div>
-  );
+  return <p className="empty-state">{message}</p>;
+}
+
+/**
+ * Notice band. `tone` is severity, and each tone also changes the left rule,
+ * so the three are distinguishable without relying on hue.
+ */
+export function Notice({
+  children,
+  tone = "neutral",
+}: {
+  children: React.ReactNode;
+  tone?: "neutral" | "warning" | "danger" | "success";
+}) {
+  const cls =
+    tone === "neutral" ? "notice" : `notice notice--${tone}`;
+  return <div className={cls}>{children}</div>;
 }
 
 export function DataTable({
   columns,
   rows,
+  emptyMessage = "No records yet.",
 }: {
   columns: string[];
   rows: (string | number | null)[][];
+  emptyMessage?: string;
 }) {
   if (rows.length === 0) {
-    return <EmptyState message="No data yet." />;
+    return <EmptyState message={emptyMessage} />;
   }
 
   return (
-    <div className="overflow-x-auto rounded-[var(--radius-sm)] border border-line bg-white">
-      <table className="w-full min-w-max border-collapse text-left text-sm">
+    <div className="table-wrap">
+      <table className="data-table min-w-max">
         <thead>
           <tr>
             {columns.map((col) => (
-              <th
-                key={col}
-                className="whitespace-nowrap border-b border-line px-4 py-2 font-semibold text-muted"
-              >
+              <th key={col} scope="col">
                 {col}
               </th>
             ))}
@@ -107,13 +200,17 @@ export function DataTable({
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} className="hover:bg-surface">
+            <tr key={i}>
               {row.map((cell, j) => (
                 <td
                   key={j}
-                  className="border-b border-line px-4 py-2 text-main"
+                  /* The first column identifies the row, so it gets the
+                     serif treatment; the rest stay in the interface face.
+                     A null renders as an em dash in the muted colour —
+                     "not recorded" is information, not an absence. */
+                  className={j === 0 ? "cell-name" : undefined}
                 >
-                  {cell ?? "—"}
+                  {cell ?? <span className="text-muted">—</span>}
                 </td>
               ))}
             </tr>

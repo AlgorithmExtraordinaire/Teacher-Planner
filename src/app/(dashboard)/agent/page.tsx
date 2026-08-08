@@ -33,7 +33,7 @@ export default async function AgentPage() {
         {(pendingProposals ?? 0) > 0 && (
           <Link
             href="/agent/proposals"
-            className="h-fit rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100"
+            className="btn-outline h-fit"
           >
             {pendingProposals} proposal
             {pendingProposals === 1 ? "" : "s"} awaiting review
@@ -49,7 +49,7 @@ export default async function AgentPage() {
           <form key={s.id} action={startConversation}>
             <input type="hidden" name="specialist" value={s.id} />
             <button type="submit" className="w-full text-left">
-              <Card className="h-full transition hover:border-navy">
+              <Card className="h-full transition hover:border-line-strong">
                 <p className="text-sm font-medium text-ink">{s.label}</p>
                 <p className="mt-1 text-xs text-body">{s.blurb}</p>
               </Card>
@@ -67,7 +67,7 @@ export default async function AgentPage() {
         <div className="flex flex-col gap-2">
           {(conversations ?? []).map((c) => (
             <Link key={c.id} href={`/agent/${c.id}`}>
-              <Card className="p-3 transition hover:border-navy">
+              <Card className="p-3 transition hover:border-line-strong">
                 <div className="flex items-center justify-between gap-4">
                   <p className="truncate text-sm text-body">{c.title}</p>
                   <span className="shrink-0 text-xs text-body">

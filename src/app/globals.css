@@ -1,195 +1,147 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   TEACHER PLANNER DESIGN SYSTEM
-   3-in-1 theme architecture, switched by [data-theme] on <html>.
+   TEACHER PLANNER — DESIGN SYSTEM
+   Derived from the "North Capital" institutional template
+   (designer2/e165a944-6616-4e02-a2b2-96d88134a3d8).
 
-   Fonts are NOT imported from fonts.googleapis.com. next/font self-hosts
-   Inter, Poppins and JetBrains Mono at build time (see app/layout.tsx),
-   which removes a render-blocking third-party request, eliminates the flash
-   of fallback text, and keeps the app working if Google Fonts is blocked.
-   The variables below point at those self-hosted faces.
+   ONE system, ONE palette. The public landing page, the login screen and
+   every signed-in surface resolve their colour, radius, spacing and type
+   through the tokens below, so no page can drift from the template.
+
+   WHAT CHANGED FROM THE PREVIOUS SYSTEM
+   The planner previously shipped three switchable themes (Lean Academy,
+   Zen Workspace, Deep Work). Two of them contradicted this template — a
+   light sage workspace and a neon-purple dark mode cannot be "in synch"
+   with an institutional navy-and-amber design at the same time. The
+   `[data-theme]` layer and its switcher were therefore removed rather
+   than left in place emitting off-template colour. The token indirection
+   is kept: re-introducing a variant means adding one scoped block here,
+   not touching components.
+
+   TYPEFACES
+   Source Serif 4 (display, with italic used as the accent voice), Inter
+   (interface and body), IBM Plex Mono (labels, codes, all figures).
+   Self-hosted by next/font — see app/layout.tsx. No fonts.googleapis.com
+   request, no flash of fallback text, works if Google Fonts is blocked.
+
+   CONTRAST — measured, not assumed. Against --bg #0a1628:
+     --fg      16.14:1    --fg-dim   6.19:1    --amber   9.91:1
+     --green    9.39:1    --red      5.97:1
+   Against the lighter --panel #122642 surface, the worst case is
+   --fg-dim at 5.19:1 and --red at 5.01:1. Every text pair in the system
+   clears WCAG AA (4.5:1); most clear AAA (7:1). --line is a 1.47:1
+   hairline and is used only for borders, never for text.
    ========================================================================== */
 
-/* ==========================================================================
-   THEME 1: "LEAN ACADEMY" (DEFAULT / ADMIN)
-   ========================================================================== */
-:root,
-[data-theme="lean-academy"] {
-  --color-primary: #1b365d; /* Trust Navy */
-  --color-primary-hover: #2a4c7e;
-  --color-accent: #d4af37; /* Gold */
-  --color-alert: #8a1538; /* Crimson */
+:root {
+  /* ---- Template palette, verbatim ------------------------------------- */
+  --bg: #0a1628; /* page */
+  --bg-2: #0e1d34; /* recessed bands, table heads, inset tiles */
+  --panel: #122642; /* raised surfaces: cards, dashboards */
+  --fg: #eef2f8;
+  --fg-dim: #8a98ad;
+  --line: #1d3559;
+  --amber: #e8b94d; /* the single accent: actions, active state, figures */
+  --green: #4ad19a;
+  --red: #e87060;
 
-  --bg-app: #f4f7f9;
-  --bg-surface: #ffffff;
-  --bg-sidebar: var(--color-primary);
+  /* Amber hover, from the template's .btn-primary:hover. */
+  --amber-hover: #f0c66a;
 
-  --font-base: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono-stack: var(--font-jetbrains), "JetBrains Mono", ui-monospace,
-    monospace;
+  /* Tints of the accents for badge fills. Kept as explicit rgba() rather
+     than colour-mix so the value is legible in devtools and stable across
+     browsers. */
+  --amber-tint: rgba(232, 185, 77, 0.15);
+  --green-tint: rgba(74, 209, 154, 0.15);
+  --red-tint: rgba(232, 112, 96, 0.15);
+  --blue-tint: rgba(140, 160, 210, 0.15);
+  --blue-ink: #8ca0d2;
 
-  --text-main: #1a202c;
-  --text-muted: #4a5568;
-  --text-inverse: #ffffff;
+  /* ---- Semantic aliases ------------------------------------------------
+     Components reference these, never the raw palette above, so a palette
+     change is a one-line edit. */
+  --bg-app: var(--bg);
+  --bg-recessed: var(--bg-2);
+  --bg-surface: var(--panel);
+  --bg-sidebar: var(--bg-2);
 
-  --border-color: #cbd5e1;
-  --border-width: 1px;
-  --radius-card: 4px;
+  --text-main: var(--fg);
+  --text-muted: var(--fg-dim);
+  --text-accent: var(--amber);
+  /* Label colour placed on an amber or green fill. The accents are light,
+     so this is the page navy — white on amber is 1.9:1. */
+  --text-on-accent: var(--bg);
+
+  --border-color: var(--line);
+  --border-strong: #2a4a78; /* one step up, for emphasised table rules */
+
+  --status-success: var(--green);
+  --status-warning: var(--amber);
+  --status-danger: var(--red);
+  --status-info: var(--blue-ink);
+
+  /* ---- Geometry --------------------------------------------------------
+     The template is deliberately tight: 4px on controls, 8px on panels.
+     Nothing in this system is pill-shaped except status badges. */
   --radius-btn: 4px;
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
-
-  --status-success: #276749;
-  --status-warning: #b7791f;
-  --status-danger: var(--color-alert);
-
-  /* Text colour placed on top of each status fill. */
-  --on-status-success: #ffffff;
-  --on-status-warning: #ffffff;
-  --on-status-danger: #ffffff;
-
-  /*
-   * Sidebar tokens are separate because the sidebar is dark in two themes and
-   * light in one. Deriving them from --text-* would put dark text on navy.
-   *   white on navy 12.1:1 · slate-blue label 4.7:1 · gold active 5.8:1
-   */
-  --sidebar-fg: #ffffff;
-  --sidebar-muted: #8fa3bf;
-  --sidebar-active: var(--color-accent);
-}
-
-/* ==========================================================================
-   THEME 2: "ZEN WORKSPACE" (MINIMALIST)
-   ========================================================================== */
-[data-theme="zen-workspace"] {
-  --color-primary: #8ba89f; /* Sage Green */
-  --color-primary-hover: #7a978e;
-  --color-accent: #aec4d6; /* Dusty Blue */
-  --color-alert: #d6a292; /* Pale Terracotta */
-
-  --bg-app: #f9fafb;
-  --bg-surface: #ffffff;
-  --bg-sidebar: #f9fafb;
-
-  --font-base: var(--font-poppins), "Poppins", ui-sans-serif, system-ui,
-    sans-serif;
-  --font-mono-stack: var(--font-jetbrains), "JetBrains Mono", ui-monospace,
-    monospace;
-
-  --text-main: #374151;
-  /*
-   * Specified as #9CA3AF, which measures 2.48:1 on this off-white background
-   * and fails WCAG AA for body text. Darkened one step to #6B7280 (4.83:1),
-   * the smallest change that keeps the soft grey character while staying
-   * readable. Revert to #9CA3AF if the aesthetic must win.
-   */
-  --text-muted: #6b7280;
-  --text-inverse: #374151; /* light sidebar, so "inverse" is dark here */
-
-  --border-color: transparent;
-  --border-width: 0px;
-  --radius-card: 16px;
-  --radius-btn: 12px;
-  --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.04),
-    0 8px 10px -6px rgba(0, 0, 0, 0.01);
-
-  /*
-   * Success was #8BA89F, which is 2.56:1 under white badge text. Darkened to
-   * a deeper sage so white reads at 5.54:1. Warning keeps its pale yellow but
-   * takes dark text rather than white.
-   */
-  --status-success: #4f6f65;
-  --status-warning: #fcd34d;
-  --status-danger: #b06a53; /* deepened terracotta: 4.6:1 under white */
-
-  --on-status-success: #ffffff;
-  --on-status-warning: #1f2937;
-  --on-status-danger: #ffffff;
-
-  /* Light sidebar: dark text, and the active state is deep sage rather than
-     dusty blue, which would be near-invisible on off-white. */
-  --sidebar-fg: #374151;
-  --sidebar-muted: #6b7280;
-  --sidebar-active: #4f6f65;
-}
-
-/* ==========================================================================
-   THEME 3: "DEEP WORK" (DARK MODE)
-   ========================================================================== */
-[data-theme="deep-work"] {
-  --color-primary: #b388ff; /* Neon Purple */
-  --color-primary-hover: #d1b3ff;
-  --color-accent: #00e5ff; /* Electric Cyan */
-  --color-alert: #ff5252;
-
-  --bg-app: #121212;
-  --bg-surface: #1e1e1e;
-  --bg-sidebar: #181818;
-
-  --font-base: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono-stack: var(--font-jetbrains), "JetBrains Mono", ui-monospace,
-    monospace;
-
-  --text-main: #f3f4f6;
-  --text-muted: #9ca3af; /* 7.0:1 on #121212 — passes here */
-  --text-inverse: #121212;
-
-  --border-color: #333333;
-  --border-width: 1px;
   --radius-card: 8px;
-  --radius-btn: 6px;
-  --shadow-card: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 30px 80px rgba(0, 0, 0, 0.4);
+  --shadow-panel: 0 12px 32px rgba(0, 0, 0, 0.28);
 
-  --status-success: #69f0ae;
-  --status-warning: #ffd740;
-  --status-danger: #ff5252;
+  /* ---- Type ------------------------------------------------------------ */
+  --font-display: var(--font-source-serif), "Source Serif 4", Georgia, serif;
+  --font-base: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono-stack:
+    var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
 
-  /* Neon fills are light, so status text goes dark for contrast. */
-  --on-status-success: #06281a;
-  --on-status-warning: #000000;
-  --on-status-danger: #2b0000;
-
-  /* Cyan on near-black measures ~11:1 — the vibrant active state the theme
-     is going for, without sacrificing legibility. */
-  --sidebar-fg: #f3f4f6;
-  --sidebar-muted: #9ca3af;
-  --sidebar-active: var(--color-accent);
+  /* Shell metrics, referenced by both the sidebar and the content offset so
+     they cannot disagree. */
+  --sidebar-w: 268px;
+  --shell-max: 1320px; /* .container in the template */
+  --shell-pad: 32px;
 }
 
 /* ==========================================================================
    TAILWIND BRIDGE
-   Utilities resolve to theme variables, so existing components restyle
-   themselves when [data-theme] changes — no per-component theme logic.
+   Utility classes resolve to the tokens above. The alias names are the ones
+   already used across ~30 pages (text-main, bg-surface, border-line, …), so
+   those pages restyle themselves without edits, and there is exactly one
+   definition of each colour.
    ========================================================================== */
 @theme {
-  --color-navy: var(--color-primary);
-  --color-primary-hover: var(--color-primary-hover);
-  --color-gold: var(--color-accent);
-  --color-crimson: var(--color-alert);
-  --color-crimson-hover: var(--color-alert);
+  --color-app: var(--bg-app);
+  --color-recessed: var(--bg-recessed);
+  --color-surface: var(--bg-surface);
+  --color-panel: var(--bg-surface);
 
   --color-main: var(--text-main);
   --color-ink: var(--text-main);
   --color-muted: var(--text-muted);
   --color-body: var(--text-muted);
-  --color-inverse: var(--text-inverse);
+  --color-inverse: var(--text-on-accent);
 
-  --color-surface: var(--bg-surface);
-  --color-app: var(--bg-app);
   --color-line: var(--border-color);
-  --color-line-strong: var(--border-color);
+  --color-line-strong: var(--border-strong);
 
-  /* Sidebar shades: derived from the theme so they follow it. */
-  --color-navy-hover: var(--color-primary-hover);
-  --color-navy-border: var(--border-color);
-  --color-navy-fg: var(--text-inverse);
-  --color-navy-muted: var(--text-muted);
+  /* Brand aliases retained from the previous system. "navy" is now the
+     page ground rather than a foreground brand colour, and the amber
+     accent carries what gold and crimson used to carry between them. */
+  --color-navy: var(--bg-app);
+  --color-gold: var(--amber);
+  --color-amber: var(--amber);
+  --color-accent: var(--amber);
+  --color-accent-hover: var(--amber-hover);
+  --color-crimson: var(--red);
+  --color-crimson-hover: var(--red);
 
   --color-success: var(--status-success);
   --color-warning: var(--status-warning);
   --color-danger: var(--status-danger);
+  --color-info: var(--status-info);
 
   --font-sans: var(--font-base);
+  --font-serif: var(--font-display);
   --font-mono: var(--font-mono-stack);
 }
 
@@ -200,6 +152,10 @@
   box-sizing: border-box;
 }
 
+html {
+  background-color: var(--bg-app);
+}
+
 body {
   font-family: var(--font-base);
   background-color: var(--bg-app);
@@ -207,27 +163,42 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
+::selection {
+  background: var(--amber);
+  color: var(--bg);
 }
 
+a {
+  color: inherit;
+}
+
+/* Headings are the display serif — the template's strongest signature. */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
 }
 
+/* The accent voice: italic serif in amber. Used for the emphasised word in a
+   heading and for the significant figure in a metric. */
+.it {
+  font-style: italic;
+  color: var(--amber);
+}
+
+.serif {
+  font-family: var(--font-display);
+}
+
+.mono,
 code,
 pre,
 .font-mono,
@@ -239,301 +210,1607 @@ pre,
   font-weight: 500;
 }
 
+/* Micro-label: the "§01 — APPROACH" / "NAV / UNIT" device that appears above
+   almost every block in the template. */
+.eyebrow {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+.eyebrow--muted {
+  color: var(--text-muted);
+}
+
+.eyebrow--rule {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eyebrow--rule::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: currentColor;
+}
+
 table {
   font-variant-numeric: tabular-nums;
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--amber);
   outline-offset: 2px;
 }
 
-/* ==========================================================================
-   COMPONENTS
-   ========================================================================== */
-.card {
-  background-color: var(--bg-surface);
-  border: var(--border-width) solid var(--border-color);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  padding: 1.5rem;
-  transition: background-color 0.3s ease, border-color 0.3s ease,
-    box-shadow 0.3s ease;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
+/* Shared horizontal rhythm — the template's .container. */
+.container,
+.shell {
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding-inline: var(--shell-pad);
+}
+
+@media (max-width: 640px) {
+  .container,
+  .shell {
+    padding-inline: 20px;
+  }
+}
+
+/* ==========================================================================
+   SURFACES
+   ========================================================================== */
+.card,
+.panel {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+}
+
+/* The hero dashboard treatment: same surface, heavier lift. Reserved for the
+   one dominant panel on a page. */
+.panel--raised {
+  box-shadow: var(--shadow-card);
+}
+
+.panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 20px;
+}
+
+.panel__title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 500;
+}
+
+/* Inset tile on a panel — recessed rather than raised, as in the template's
+   .kpi blocks. */
+.inset {
+  background: var(--bg-recessed);
+  border-radius: 6px;
+  padding: 14px;
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
 .btn,
 .btn-primary,
-.btn-accent {
+.btn-accent,
+.btn-outline,
+.btn-ghost,
+.btn-danger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-btn);
+  gap: 8px;
+  padding: 10px 20px;
   font-family: var(--font-base);
-  font-size: 0.875rem;
+  font-size: 13px;
   font-weight: 500;
-  border: none;
+  line-height: 1.2;
+  border-radius: var(--radius-btn);
+  border: 1px solid transparent;
+  text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
-.btn-primary {
-  background-color: var(--color-primary);
-  color: #ffffff;
-}
-
-.btn-primary:hover {
-  background-color: var(--color-primary-hover);
-}
-
-/*
- * Accent fills are light in every theme (gold, dusty blue, cyan), so the
- * label is the app background rather than white — white on gold is 1.9:1.
- */
+/* Primary is amber-on-navy in this system. `.btn-primary` and `.btn-accent`
+   are the same button: the template has one filled action, and giving the
+   two class names different looks is how a second one gets invented. */
+.btn-primary,
 .btn-accent {
-  background-color: var(--color-accent);
-  color: var(--bg-app);
+  background-color: var(--amber);
+  color: var(--text-on-accent);
   font-weight: 600;
 }
 
-[data-theme="zen-workspace"] .btn-accent,
-[data-theme="lean-academy"] .btn-accent,
-:root .btn-accent {
-  color: var(--color-primary);
+.btn-primary:hover,
+.btn-accent:hover {
+  background-color: var(--amber-hover);
 }
 
-[data-theme="deep-work"] .btn-primary:hover {
-  box-shadow: 0 0 12px rgba(179, 136, 255, 0.4);
+.btn-outline,
+.btn-ghost {
+  background-color: transparent;
+  border-color: var(--border-color);
+  color: var(--text-main);
 }
 
-[data-theme="deep-work"] .btn-accent:hover {
-  box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+.btn-outline:hover,
+.btn-ghost:hover {
+  border-color: var(--text-main);
 }
 
+/* Destructive actions only. Outlined rather than filled: a delete should
+   read as deliberate, not as the obvious next click. */
+.btn-danger {
+  background-color: transparent;
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.btn-danger:hover {
+  background-color: var(--red);
+  color: var(--bg);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.btn-lg {
+  padding: 14px 28px;
+  font-size: 15px;
+}
+
+.btn:disabled,
 .btn-primary:disabled,
-.btn-accent:disabled {
-  opacity: 0.6;
+.btn-accent:disabled,
+.btn-outline:disabled,
+.btn-ghost:disabled,
+.btn-danger:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ==========================================================================
+   FORM CONTROLS
+   Inputs sit on the recessed ground so a form reads as something you type
+   into rather than another card.
+   ========================================================================== */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: 9px 12px;
+  font-family: var(--font-base);
+  font-size: 14px;
+  color: var(--text-main);
+  background-color: var(--bg-recessed);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  transition: border-color 0.2s ease;
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.input:hover,
+.select:hover,
+.textarea:hover {
+  border-color: var(--border-strong);
+}
+
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  border-color: var(--amber);
+}
+
+/* Native selects render their popup with the OS palette; setting both
+   properties keeps the closed control legible on the dark ground. */
+.select option {
+  background-color: var(--bg-recessed);
+  color: var(--text-main);
+}
+
+/* ==========================================================================
+   METRICS
+   The template states a figure in the display serif, its label in mono
+   above, and its movement in mono below. Value ≫ label, always.
+   ========================================================================== */
+.kpi {
+  background: var(--bg-recessed);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.kpi__label {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.kpi__value {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  margin-top: 6px;
+}
+
+.kpi__value--accent {
+  font-style: italic;
+  color: var(--amber);
+}
+
+.kpi__value--danger {
+  color: var(--red);
+}
+
+.kpi__note {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  margin-top: 6px;
+  color: var(--text-muted);
+}
+
+.kpi__note--up {
+  color: var(--green);
+}
+
+.kpi__note--down {
+  color: var(--red);
+}
+
+/* ==========================================================================
+   TABLES
+   The template's .pt-head / .pt-row: mono uppercase head on the recessed
+   band, hairline-separated rows, figures in mono.
+   ========================================================================== */
+.table-wrap {
+  overflow-x: auto;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  text-align: left;
 }
 
 .data-table th {
+  padding: 14px 20px;
+  background: var(--bg-recessed);
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--text-muted);
-  text-align: left;
-  padding: 1rem;
-  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .data-table td {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 20px;
+  font-size: 14px;
   color: var(--text-main);
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: top;
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.8125rem;
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.data-table tbody tr:hover td {
+  background: var(--bg-recessed);
+}
+
+/* Row-leading identifier, e.g. a standard code or a class name. */
+.data-table .cell-name {
+  font-family: var(--font-display);
+  font-size: 15px;
   font-weight: 500;
 }
 
+.data-table .cell-name small {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.data-table .cell-num {
+  font-family: var(--font-mono-stack);
+  font-size: 13px;
+}
+
+/* ==========================================================================
+   BADGES
+   Tinted fill with a full-strength label — the template's holding-icon
+   treatment. Never a saturated fill behind small text.
+   ========================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
 .badge-success {
-  background-color: var(--status-success);
-  color: var(--on-status-success);
+  background-color: var(--green-tint);
+  color: var(--green);
 }
+
 .badge-warning {
-  background-color: var(--status-warning);
-  color: var(--on-status-warning);
+  background-color: var(--amber-tint);
+  color: var(--amber);
 }
+
 .badge-danger {
-  background-color: var(--status-danger);
-  color: var(--on-status-danger);
+  background-color: var(--red-tint);
+  color: var(--red);
 }
+
+.badge-info {
+  background-color: var(--blue-tint);
+  color: var(--blue-ink);
+}
+
 .badge-neutral {
-  background-color: var(--bg-app);
+  background-color: var(--bg-recessed);
   color: var(--text-muted);
   border: 1px solid var(--border-color);
 }
 
-/* Kanban column rules, tinted by the theme's own palette. */
+/* ==========================================================================
+   NOTICES
+   A bordered band, tinted by severity. Used for "nothing here yet",
+   "this needs attention" and error reporting.
+   ========================================================================== */
+.notice {
+  padding: 14px 18px;
+  border: 1px solid var(--border-color);
+  border-left: 2px solid var(--text-muted);
+  border-radius: var(--radius-btn);
+  background: var(--bg-recessed);
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.notice--warning {
+  border-left-color: var(--amber);
+  background: var(--amber-tint);
+  color: var(--fg);
+}
+
+.notice--danger {
+  border-left-color: var(--red);
+  background: var(--red-tint);
+  color: var(--fg);
+}
+
+.notice--success {
+  border-left-color: var(--green);
+  background: var(--green-tint);
+  color: var(--fg);
+}
+
+.empty-state {
+  padding: 40px 24px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-card);
+}
+
+/* ==========================================================================
+   KANBAN
+   Column identity comes from the rule under its heading, in the accent that
+   matches the stage: muted for not-started, amber for in-flight, green for
+   done.
+   ========================================================================== */
 .kanban-head {
-  padding-bottom: 0.25rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 10px;
   border-bottom: 2px solid var(--border-color);
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-main);
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
+
 .kanban-head--todo {
-  border-bottom-color: var(--color-primary);
+  border-bottom-color: var(--border-strong);
 }
+
 .kanban-head--progress {
-  border-bottom-color: var(--color-accent);
+  border-bottom-color: var(--amber);
+  color: var(--amber);
 }
+
 .kanban-head--review {
-  border-bottom-color: var(--color-alert);
+  border-bottom-color: var(--green);
+  color: var(--green);
 }
 
 .kanban-item {
-  margin-top: 1rem;
-  padding: 0.5rem;
-  background: var(--bg-app);
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--bg-recessed);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-btn);
-  font-size: 0.875rem;
+  font-size: 13px;
+}
+
+.kanban-item:hover {
+  border-color: var(--border-strong);
+}
+
+/* ==========================================================================
+   APPLICATION SHELL
+   Sidebar + workspace. The sidebar is the template's recessed band; the
+   header is the template's sticky nav, blur and all.
+   ========================================================================== */
+.shell-frame {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-app);
+}
+
+.side {
+  display: none;
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 28px;
+  overflow-y: auto;
+  padding: 26px 22px 32px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
+}
+
+@media (min-width: 900px) {
+  .side {
+    display: flex;
+  }
+}
+
+/* The template's diamond mark. A clip-path rather than an asset: it scales,
+   it inherits the accent colour, and it costs no request. */
+.mark {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  background: var(--amber);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.mark--sm {
+  width: 22px;
+  height: 22px;
+}
+
+.side__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.side__brand-name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.side__brand-sub {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono-stack);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+.side__section-label {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.side__link {
+  display: block;
+  padding: 7px 10px;
+  margin-left: -10px;
+  font-size: 13.5px;
+  border-radius: var(--radius-btn);
+  color: var(--text-muted);
+  text-decoration: none;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.side__link:hover {
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Active state carries the accent and a left rule, so it survives being
+   scanned quickly and does not rely on colour alone. */
+.side__link[aria-current="page"] {
+  color: var(--amber);
+  background: var(--amber-tint);
+  box-shadow: inset 2px 0 0 var(--amber);
+}
+
+.workspace {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow-y: auto;
+  background: var(--bg-app);
+}
+
+.workspace__header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  /* The workspace is a column flex container, so chrome that must keep its
+     intrinsic height has to opt out of shrinking — otherwise the tall
+     scrolling body squeezes the header and the ticker down to their padding. */
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 32px;
+  background: rgba(10, 22, 40, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.workspace__title {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.workspace__meta {
+  margin-top: 2px;
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.workspace__body {
+  /* Takes the remaining height and owns the vertical scroll, so the sticky
+     header and the ticker above it stay put. */
+  flex: 1 1 auto;
+  padding: 32px;
+}
+
+@media (max-width: 640px) {
+  .workspace__header {
+    padding: 14px 20px;
+  }
+
+  .workspace__body {
+    padding: 20px;
+  }
+}
+
+/* Mobile navigation. The sidebar is hidden below 900px, so the same nav is
+   emitted as a <details> disclosure — no JavaScript, no duplicate route
+   list, and it collapses again on navigation because the page reloads. */
+.side-mobile {
+  display: block;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-sidebar);
+}
+
+@media (min-width: 900px) {
+  .side-mobile {
+    display: none;
+  }
+}
+
+.side-mobile > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber);
+  cursor: pointer;
+  list-style: none;
+}
+
+.side-mobile > summary::-webkit-details-marker {
+  display: none;
+}
+
+.side-mobile > summary::after {
+  content: "▾";
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.side-mobile[open] > summary::after {
+  content: "▴";
+}
+
+.side-mobile__panel {
+  padding: 4px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Page heading block inside the workspace. */
+.page-head {
+  margin-bottom: 24px;
+}
+
+.page-head__title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+.page-head__desc {
+  margin-top: 8px;
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+/* Section heading inside a page — mono, to sit below the serif page title
+   without competing with it. */
+.section-label {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+/* ==========================================================================
+   TICKER
+   The template's scrolling strip. Here it carries live school figures
+   instead of instrument prices.
+
+   The track holds the same items twice and translates by -50%, so the loop
+   is seamless. Duplication is in the markup because a CSS-only copy cannot
+   be read by a screen reader — the second copy is aria-hidden and the whole
+   strip is presentational.
+   ========================================================================== */
+.ticker {
+  flex: 0 0 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  background: var(--bg-recessed);
+  border-bottom: 1px solid var(--border-color);
+  padding: 9px 0;
+  /* The track is an inline-block, so its line box governs the strip's height.
+     Pinning line-height here keeps the strip exactly one line tall instead of
+     inheriting the body's 1.6 and leaving a ragged band. */
+  line-height: 1.5;
+}
+
+.ticker__track {
+  display: inline-block;
+  animation: ticker-scroll 60s linear infinite;
+  font-family: var(--font-mono-stack);
+  font-size: 11.5px;
+}
+
+.ticker:hover .ticker__track {
+  animation-play-state: paused;
+}
+
+.ticker__item {
+  display: inline-flex;
+  gap: 8px;
+  margin: 0 22px;
+}
+
+.ticker__sym {
+  color: var(--fg);
+  letter-spacing: 0.06em;
+}
+
+.ticker__val {
+  color: var(--text-muted);
+}
+
+.ticker__delta--up {
+  color: var(--green);
+}
+
+.ticker__delta--down {
+  color: var(--red);
+}
+
+@keyframes ticker-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker__track {
+    animation: none;
+  }
 }
 
 /* ==========================================================================
    PUBLIC LANDING PAGE  (route: /)
-   Reuses the theme tokens above, so the landing page and the signed-in app
-   can never drift apart on colour, radius or typeface.
-   ========================================================================== */
-.lp-shell { width: min(1200px, 100% - 3rem); margin-inline: auto; }
+   The template's section sequence, one-to-one: ticker, sticky nav, split
+   hero with a live-looking dashboard, credibility strip, three pillars,
+   a performance table, a pull-quote band, a closing invitation, footer.
 
-.lp-mast {
-  position: sticky; top: 0; z-index: 50;
-  background: var(--bg-surface);
+   These rules share the tokens above with the signed-in application, so the
+   marketing surface and the product cannot drift apart on colour, radius or
+   typeface.
+   ========================================================================== */
+.lp-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+}
+
+.lp-skip:focus {
+  left: 0;
+  padding: 12px 20px;
+  background: var(--amber);
+  color: var(--bg);
+}
+
+/* ---- Nav ---------------------------------------------------------------- */
+.lp-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 18px 0;
+  background: rgba(10, 22, 40, 0.95);
+  backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-color);
 }
-.lp-mast__inner {
-  display: flex; flex-wrap: wrap; gap: 1rem;
-  align-items: center; justify-content: space-between;
-  padding: 0.875rem 0;
-}
-.lp-brand { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
-.lp-brand__name { font-weight: 700; font-size: 0.9375rem; line-height: 1.15; letter-spacing: -0.01em; }
-.lp-brand__sub { display: block; font-weight: 500; font-size: 0.75rem; color: var(--text-muted); }
-[data-theme="deep-work"] .lp-logo { filter: brightness(1.15) saturate(1.1); }
 
-.lp-hero { padding: clamp(3rem, 8vw, 6rem) 0 3rem; text-align: center; }
+.lp-nav__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.lp-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.lp-brand__name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1.15;
+}
+
+.lp-brand__sub {
+  display: block;
+  font-family: var(--font-mono-stack);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.lp-nav__links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+  font-size: 14px;
+}
+
+.lp-nav__links a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.lp-nav__links a:hover {
+  color: var(--fg);
+}
+
+.lp-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .lp-nav__links {
+    display: none;
+  }
+}
+
+/* ---- Hero --------------------------------------------------------------- */
+.lp-hero {
+  padding: 90px 0 70px;
+}
+
+.lp-hero__grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 72px;
+  align-items: center;
+}
+
 .lp-hero h1 {
-  font-size: clamp(2.125rem, 5.2vw, 3.25rem);
-  letter-spacing: -0.02em; margin: 1rem auto 1.25rem; max-width: 20ch;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(42px, 5.4vw, 82px);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  margin: 26px 0;
 }
-.lp-lede {
-  font-size: clamp(1.0625rem, 2vw, 1.25rem); color: var(--text-muted);
-  margin: 0 auto 2rem; max-width: 60ch;
-}
-.lp-motto {
-  font-size: 0.8125rem; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--color-alert); font-weight: 600;
-}
-[data-theme="deep-work"] .lp-motto { color: var(--color-accent); }
 
-.lp-ctas { display: flex; flex-wrap: wrap; gap: 0.875rem; justify-content: center; }
-.btn-lg { padding: 0.9rem 2rem; font-size: 1.0625rem; }
-.btn-ghost {
-  background: transparent; color: var(--text-main);
-  border: 1px solid var(--border-color);
+.lp-lede {
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  max-width: 46ch;
+  margin-bottom: 32px;
 }
-.btn-ghost:hover { background: var(--bg-app); }
+
+.lp-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
 
 .lp-trust {
-  margin: 1.5rem auto 0; font-size: 0.875rem; color: var(--text-muted);
-  display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; justify-content: center;
+  display: flex;
+  gap: 32px;
+  margin-top: 52px;
+  padding-top: 26px;
+  border-top: 1px solid var(--border-color);
 }
-.lp-tick { color: var(--status-success); font-weight: 700; }
 
-.lp-mockup {
-  margin-top: 3rem; text-align: left; overflow: hidden;
+.lp-trust__v {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+}
+
+.lp-trust__l {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+@media (max-width: 1024px) {
+  .lp-hero__grid {
+    grid-template-columns: 1fr;
+    gap: 52px;
+  }
+}
+
+@media (max-width: 640px) {
+  .lp-hero {
+    padding: 52px 0 44px;
+  }
+
+  .lp-lede {
+    font-size: 16.5px;
+  }
+
+  .lp-ctas {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lp-trust {
+    flex-direction: column;
+    gap: 18px;
+  }
+}
+
+/* ---- Dashboard mock ----------------------------------------------------- */
+.lp-dash {
   background: var(--bg-surface);
-  border: var(--border-width) solid var(--border-color);
-  border-radius: calc(var(--radius-card) * 2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 22px;
   box-shadow: var(--shadow-card);
 }
-.lp-chrome {
-  display: flex; align-items: center; gap: 0.75rem;
-  padding: 0.75rem 1rem; background: var(--bg-app);
-  border-bottom: 1px solid var(--border-color);
-}
-.lp-dots { display: flex; gap: 0.375rem; }
-.lp-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--border-color); }
-.lp-url { flex: 1; text-align: center; font-size: 0.75rem; color: var(--text-muted); }
 
-.lp-tabs {
-  display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.75rem 1rem 0;
-  border-bottom: 1px solid var(--border-color);
+.lp-dash__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
+
 .lp-tab {
-  appearance: none; background: none; border: none; font: inherit;
-  font-size: 0.875rem; font-weight: 500; color: var(--text-muted);
-  padding: 0.5rem 0.875rem; cursor: pointer;
-  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  appearance: none;
+  background: none;
+  border: 0;
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
 }
-.lp-tab:hover { color: var(--text-main); }
+
+.lp-tab:hover {
+  color: var(--fg);
+}
+
 .lp-tab[aria-selected="true"] {
-  color: var(--color-primary); border-bottom-color: var(--color-primary); font-weight: 600;
-}
-[data-theme="deep-work"] .lp-tab[aria-selected="true"] {
-  color: var(--color-accent); border-bottom-color: var(--color-accent);
+  background: var(--border-color);
+  color: var(--fg);
 }
 
-.lp-spark { display: flex; align-items: flex-end; gap: 4px; height: 56px; margin-top: 1rem; }
-.lp-spark i { flex: 1; background: var(--color-primary); opacity: 0.25; border-radius: 2px 2px 0 0; }
-.lp-spark i:last-child { opacity: 1; }
-
-.lp-section { padding: clamp(3rem, 7vw, 5rem) 0; }
-.lp-section--tint { background: var(--bg-surface); border-block: 1px solid var(--border-color); }
-.lp-head { max-width: 62ch; margin-bottom: 2.5rem; }
-.lp-head h2 { font-size: clamp(1.5rem, 3.2vw, 2.125rem); margin: 0.5rem 0 0.75rem; letter-spacing: -0.015em; }
-.lp-head p { color: var(--text-muted); font-size: 1.0625rem; }
-.lp-eyebrow {
-  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--color-primary);
-}
-[data-theme="deep-work"] .lp-eyebrow { color: var(--color-accent); }
-
-.lp-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-.lp-feature h3 { font-size: 1.0625rem; margin-bottom: 0.5rem; }
-.lp-feature p { color: var(--text-muted); font-size: 0.9375rem; }
-.lp-icon {
-  width: 38px; height: 38px; border-radius: var(--radius-btn);
-  background: var(--bg-app); color: var(--color-primary);
-  display: grid; place-items: center; margin-bottom: 1rem;
-  font-size: 1.0625rem; font-weight: 700;
-}
-[data-theme="deep-work"] .lp-icon { color: var(--color-accent); }
-
-.lp-swatches { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-.lp-swatches i {
-  width: 100%; height: 40px; border-radius: var(--radius-btn);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+.lp-dash__kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.lp-cta {
-  text-align: center; color: #fff;
-  background: var(--color-primary);
-  border-radius: calc(var(--radius-card) * 2);
-  padding: clamp(2.5rem, 6vw, 4rem) 2rem;
-}
-[data-theme="deep-work"] .lp-cta { color: #121212; }
-.lp-cta h2 { font-size: clamp(1.5rem, 3.4vw, 2.25rem); margin-bottom: 0.875rem; }
-.lp-cta p { margin: 0 auto 2rem; max-width: 54ch; font-size: 1.0625rem; color: rgba(255, 255, 255, 0.85); }
-[data-theme="deep-work"] .lp-cta p { color: rgba(18, 18, 18, 0.75); }
-.lp-cta .btn-ghost { color: #fff; border-color: rgba(255, 255, 255, 0.5); }
-[data-theme="deep-work"] .lp-cta .btn-ghost { color: #121212; border-color: rgba(18, 18, 18, 0.4); }
-.lp-cta .btn-ghost:hover { background: rgba(255, 255, 255, 0.12); }
+@media (max-width: 640px) {
+  .lp-dash {
+    padding: 16px;
+  }
 
-.lp-footer {
-  padding: 2.5rem 0 3rem; margin-top: clamp(3rem, 7vw, 5rem);
+  .lp-dash__kpis {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sparkline: bars in the accent, the latest at full strength so the eye
+   lands on "now". role="img" with a label, since a chart of bars is not
+   readable as text. */
+.lp-spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 92px;
+  margin-top: 14px;
+}
+
+.lp-spark i {
+  flex: 1;
+  background: var(--amber);
+  opacity: 0.28;
+  border-radius: 2px 2px 0 0;
+}
+
+.lp-spark i:last-child {
+  opacity: 1;
+}
+
+/* Row list — the template's "top holdings" block. */
+.lp-row {
+  display: grid;
+  grid-template-columns: 26px 1.5fr 1fr 82px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 13px;
+}
+
+.lp-row:last-child {
+  border-bottom: 0;
+}
+
+.lp-row__ico {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.lp-row__ico--a {
+  background: var(--amber-tint);
+  color: var(--amber);
+}
+
+.lp-row__ico--b {
+  background: var(--green-tint);
+  color: var(--green);
+}
+
+.lp-row__ico--c {
+  background: var(--blue-tint);
+  color: var(--blue-ink);
+}
+
+.lp-row__ico--d {
+  background: var(--red-tint);
+  color: var(--red);
+}
+
+.lp-row__name small {
+  display: block;
+  margin-top: 1px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.lp-row__val {
+  font-family: var(--font-mono-stack);
+  font-size: 13px;
+  text-align: right;
+}
+
+.lp-row__d {
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .lp-row {
+    grid-template-columns: 24px 1.5fr 1fr;
+  }
+
+  .lp-row__d {
+    display: none;
+  }
+}
+
+/* ---- Credibility strip -------------------------------------------------- */
+.lp-strip {
+  padding: 46px 0;
   border-top: 1px solid var(--border-color);
-  font-size: 0.875rem; color: var(--text-muted);
-  display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between;
-}
-.lp-footer a { text-decoration: none; }
-.lp-footer a:hover { text-decoration: underline; color: var(--text-main); }
-
-.lp-note {
-  margin-top: 1rem; font-size: 0.8125rem; color: var(--text-muted);
-  border-left: 3px solid var(--border-color); padding-left: 0.875rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.lp-skip { position: absolute; left: -9999px; top: 0; z-index: 100; }
-.lp-skip:focus {
-  left: 0; background: var(--color-primary); color: #fff; padding: 0.75rem 1.25rem;
+.lp-strip__h {
+  text-align: center;
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 26px;
+}
+
+.lp-strip__grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 32px;
+  align-items: center;
+  justify-items: center;
+  opacity: 0.75;
+}
+
+.lp-strip__grid span {
+  font-family: var(--font-display);
+  font-size: 19px;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .lp-strip__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .lp-strip__grid span {
+    font-size: 16px;
+  }
+}
+
+/* ---- Sections ----------------------------------------------------------- */
+.lp-section {
+  padding: clamp(72px, 10vw, 128px) 0;
+}
+
+.lp-section--recessed {
+  background: var(--bg-recessed);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.lp-sect-head {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 56px;
+  align-items: end;
+  margin-bottom: 64px;
+}
+
+.lp-sect-head h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(34px, 4.6vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  margin-top: 14px;
+}
+
+.lp-sect-head p {
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  max-width: 52ch;
+}
+
+@media (max-width: 1024px) {
+  .lp-sect-head {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin-bottom: 44px;
+  }
+}
+
+/* Pillars: a hairline grid achieved with a 1px gap over a line-coloured
+   background, so the dividers are shared rather than doubled. */
+.lp-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.lp-pillar {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-app);
+  padding: 32px 28px;
+  min-height: 300px;
+}
+
+.lp-section--recessed .lp-pillar {
+  background: var(--bg-recessed);
+}
+
+.lp-pillar__n {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 20px;
+}
+
+.lp-pillar h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 25px;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  margin-bottom: 12px;
+}
+
+.lp-pillar p {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.lp-pillar__stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color);
+}
+
+.lp-pillar__stat .v {
+  font-family: var(--font-display);
+  font-size: 27px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.lp-pillar__stat .l {
+  font-family: var(--font-mono-stack);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: right;
+  line-height: 1.45;
+  max-width: 150px;
+}
+
+@media (max-width: 1024px) {
+  .lp-pillars {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-pillar {
+    min-height: 0;
+  }
+}
+
+/* ---- Capability table --------------------------------------------------- */
+.lp-split {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 72px;
+  align-items: start;
+}
+
+.lp-split h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(32px, 4.2vw, 52px);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  margin-bottom: 22px;
+}
+
+.lp-split p {
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.lp-split__note {
+  margin-top: 30px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  font-family: var(--font-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+@media (max-width: 1024px) {
+  .lp-split {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+}
+
+/* ---- Pull quote --------------------------------------------------------- */
+.lp-quote {
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-recessed);
+  padding: 74px 0;
+}
+
+.lp-quote__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 48px;
+}
+
+.lp-quote blockquote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(21px, 2.6vw, 31px);
+  line-height: 1.2;
+  max-width: 46ch;
+}
+
+.lp-quote figcaption {
+  font-family: var(--font-mono-stack);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--amber);
+  text-align: right;
+  line-height: 1.7;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .lp-quote__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+  }
+
+  .lp-quote figcaption {
+    text-align: left;
+  }
+}
+
+/* ---- Closing invitation ------------------------------------------------- */
+.lp-cta {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(84px, 12vw, 150px) 0;
+}
+
+/* The template's amber bloom behind the closing section. Decorative, so it
+   is a pseudo-element and pointer-events:none — it must never intercept a
+   click on the button in front of it. */
+.lp-cta::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -200px;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(232, 185, 77, 0.08),
+    transparent 60%
+  );
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.lp-cta__wrap {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.lp-cta h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(38px, 6vw, 82px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin: 22px 0;
+}
+
+.lp-cta p {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  max-width: 54ch;
+  margin: 0 auto 32px;
+}
+
+.lp-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .lp-cta__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ---- Footer ------------------------------------------------------------- */
+.lp-footer {
+  padding: 56px 0 28px;
+  border-top: 1px solid var(--border-color);
+}
+
+.lp-footer__grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 44px;
+}
+
+.lp-footer h5 {
+  font-family: var(--font-mono-stack);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.lp-footer ul {
+  list-style: none;
+}
+
+.lp-footer li {
+  padding: 5px 0;
+  font-size: 14px;
+}
+
+.lp-footer li a {
+  text-decoration: none;
+}
+
+.lp-footer li a:hover {
+  color: var(--amber);
+}
+
+.lp-footer__blurb {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin-top: 14px;
+  max-width: 34ch;
+}
+
+.lp-footer__disc {
+  padding: 22px 0;
+  border-top: 1px solid var(--border-color);
+  font-family: var(--font-mono-stack);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  line-height: 1.7;
+  color: var(--text-muted);
+  max-width: 110ch;
+}
+
+.lp-footer__bot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  padding-top: 14px;
+  font-family: var(--font-mono-stack);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .lp-footer__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  .lp-footer__grid > div:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ==========================================================================
+   LOGIN
+   ========================================================================== */
+.auth {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 40px 20px;
+  background: var(--bg-app);
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-panel);
+  padding: 32px;
+}
+
+.auth__title {
+  font-family: var(--font-display);
+  font-size: 27px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }

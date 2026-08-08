@@ -36,7 +36,7 @@ export default async function ProposalsPage() {
       />
 
       {!canReview && (
-        <Card className="mb-6 border-line bg-[#f7f9fc] text-sm text-body">
+        <Card className="mb-6 border-line bg-recessed text-sm text-body">
           You can see proposals, but only admins and grade leads can approve
           them.
         </Card>
@@ -62,7 +62,7 @@ export default async function ProposalsPage() {
                   {p.rationale && (
                     <p className="mt-2 text-sm text-body">{p.rationale}</p>
                   )}
-                  <pre className="mt-2 overflow-x-auto rounded-md bg-[#f7f9fc] p-3 text-xs text-body">
+                  <pre className="mt-2 overflow-x-auto rounded-md bg-recessed p-3 text-xs text-body">
                     {JSON.stringify(p.payload, null, 2)}
                   </pre>
                 </div>
@@ -74,7 +74,7 @@ export default async function ProposalsPage() {
                       <input type="hidden" name="decision" value="approve" />
                       <button
                         type="submit"
-                        className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
+                        className="btn-primary btn-sm"
                       >
                         Approve
                       </button>
@@ -84,7 +84,7 @@ export default async function ProposalsPage() {
                       <input type="hidden" name="decision" value="reject" />
                       <button
                         type="submit"
-                        className="rounded-md border border-line px-3 py-1.5 text-sm font-medium text-body hover:bg-[#f1f4f8]"
+                        className="btn-outline btn-sm"
                       >
                         Reject
                       </button>

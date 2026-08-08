@@ -23,11 +23,17 @@ const ROLE_LABEL: Record<string, string> = {
   other: "Other",
 };
 
+/**
+ * Document role → badge tone, using the design system's four tones rather
+ * than a colour per role. The distinction that matters to a teacher is
+ * "is this the pupil's copy or mine", so the two teaching-facing roles take
+ * the accent and the pupil-facing one is informational.
+ */
 const ROLE_TONE: Record<string, string> = {
-  student_workbook: "bg-blue-50 text-blue-700 ring-blue-600/20",
-  teacher_edition: "bg-violet-50 text-violet-700 ring-violet-600/20",
-  additional_materials: "bg-amber-50 text-amber-700 ring-amber-600/20",
-  full_module: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
+  student_workbook: "badge-info",
+  teacher_edition: "badge-warning",
+  additional_materials: "badge-neutral",
+  full_module: "badge-success",
 };
 
 function mb(bytes: number | null) {
@@ -58,35 +64,42 @@ export function ResourcePicker({
 
   if (resources.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-line bg-white p-8 text-center text-sm text-body">
+      <p className="empty-state">
         No files indexed here yet. The Drive crawler populates these as it runs.
-      </div>
+      </p>
     );
   }
 
   return (
     <div>
       {selected.size > 0 && (
+        // Selection bar. Sits on the raised panel with an accent rule rather
+        // than a filled band: the page ground is already navy, so a navy bar
+        // would disappear into it.
         <form
           action={addToFolder}
-          className="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-navy bg-navy px-4 py-3 text-sm text-white"
+          className="mb-3 flex flex-wrap items-center gap-3 rounded-[var(--radius-card)] border border-line bg-surface px-4 py-3 text-sm shadow-[inset_2px_0_0_var(--amber)]"
         >
           {[...selected].map((id) => (
             <input key={id} type="hidden" name="resource_id" value={id} />
           ))}
-          <span className="font-medium">
+          <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-gold">
             {selected.size} selected
           </span>
           {folders.length === 0 ? (
-            <span className="text-navy-fg">
+            <span className="text-muted">
               Create a folder first to file these.
             </span>
           ) : (
             <>
+              <label htmlFor="folder_id" className="sr-only">
+                Destination folder
+              </label>
               <select
+                id="folder_id"
                 name="folder_id"
                 required
-                className="rounded-md border border-navy-border bg-navy-hover px-2 py-1.5 text-sm text-white"
+                className="select w-auto"
               >
                 {folders.map((f) => (
                   <option key={f.id} value={f.id}>
@@ -94,10 +107,7 @@ export function ResourcePicker({
                   </option>
                 ))}
               </select>
-              <button
-                type="submit"
-                className="rounded-md bg-white px-3 py-1.5 text-sm font-medium text-ink hover:bg-[#f1f4f8]"
-              >
+              <button type="submit" className="btn-primary btn-sm">
                 Add to folder
               </button>
             </>
@@ -105,14 +115,14 @@ export function ResourcePicker({
           <button
             type="button"
             onClick={() => setSelected(new Set())}
-            className="ml-auto text-xs text-navy-fg hover:text-white"
+            className="btn-ghost btn-sm ml-auto"
           >
             Clear
           </button>
         </form>
       )}
 
-      <div className="overflow-hidden rounded-lg border border-line bg-white shadow-sm">
+      <div className="table-wrap">
         <ul className="divide-y divide-line">
           {resources.map((r) => {
             const isOn = selected.has(r.id);
@@ -120,28 +130,27 @@ export function ResourcePicker({
               <li
                 key={r.id}
                 className={`flex items-center gap-3 px-4 py-3 ${
-                  isOn ? "bg-[#f7f9fc]" : "hover:bg-[#f7f9fc]"
+                  isOn ? "bg-recessed" : "hover:bg-recessed"
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={isOn}
                   onChange={() => toggle(r.id)}
-                  className="h-4 w-4 shrink-0 rounded border-line"
+                  className="h-4 w-4 shrink-0 accent-[var(--amber)]"
                   aria-label={`Select ${r.name}`}
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm text-body">{r.name}</p>
-                  <p className="text-xs text-body">
+                  <p className="truncate text-sm text-main">{r.name}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.06em] text-muted">
                     {r.section_name ? `${r.section_name} · ` : ""}
                     {mb(r.file_size)}
                   </p>
                 </div>
                 {r.doc_role && (
                   <span
-                    className={`hidden shrink-0 rounded-md px-2 py-0.5 text-xs font-medium ring-1 ring-inset sm:inline ${
-                      ROLE_TONE[r.doc_role] ??
-                      "bg-[#f1f4f8] text-body ring-body/20"
+                    className={`badge hidden shrink-0 sm:inline-flex ${
+                      ROLE_TONE[r.doc_role] ?? "badge-neutral"
                     }`}
                   >
                     {ROLE_LABEL[r.doc_role] ?? r.doc_role}
@@ -152,9 +161,9 @@ export function ResourcePicker({
                     href={r.file_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="shrink-0 text-xs font-medium text-body hover:text-ink"
+                    className="btn-ghost btn-sm shrink-0"
                   >
-                    Open
+                    Open ↗
                   </a>
                 )}
               </li>
