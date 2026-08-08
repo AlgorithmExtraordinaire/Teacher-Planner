@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/dal";
-import { PageHeader, Card, EmptyState } from "@/components/ui";
+import { PageHeader, Card, EmptyState, Notice } from "@/components/ui";
 import { Badge } from "@/components/cell";
 import { FolderForm } from "@/app/(dashboard)/resources/folders/folder-form";
 import {
@@ -42,10 +42,10 @@ export default async function FoldersPage() {
           title="My Folders"
           description="Your own organisation of the curriculum catalogue."
         />
-        <Card className="border-amber-200 bg-amber-50 text-sm text-amber-800">
+        <Notice tone="warning">
           Folders belong to a teacher record, and your account isn&apos;t linked
           to one yet. Ask an admin to link it, then this page will work.
-        </Card>
+        </Notice>
       </div>
     );
   }
@@ -94,7 +94,7 @@ export default async function FoldersPage() {
               <input type="hidden" name="folder_id" value={f.id} />
               <button
                 type="submit"
-                className="text-xs font-medium text-body hover:text-red-600"
+                className="text-xs font-medium text-body hover:text-danger"
               >
                 Delete
               </button>
@@ -138,7 +138,7 @@ export default async function FoldersPage() {
                     <input type="hidden" name="item_id" value={it.id} />
                     <button
                       type="submit"
-                      className="shrink-0 text-xs text-body hover:text-red-600"
+                      className="shrink-0 text-xs text-body hover:text-danger"
                     >
                       Remove
                     </button>
@@ -162,7 +162,7 @@ export default async function FoldersPage() {
         />
         <Link
           href="/resources"
-          className="h-fit rounded-md border border-line px-3 py-2 text-sm font-medium text-body hover:bg-[#f1f4f8]"
+          className="btn-outline h-fit"
         >
           Browse catalogue
         </Link>

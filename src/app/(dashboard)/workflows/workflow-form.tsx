@@ -18,7 +18,7 @@ export function WorkflowForm() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-md bg-crimson px-4 py-2 text-sm font-medium text-white hover:bg-crimson-hover"
+        className="btn-primary"
       >
         + New workflow
       </button>
@@ -28,7 +28,7 @@ export function WorkflowForm() {
   return (
     <form
       action={action}
-      className="flex max-w-2xl flex-col gap-4 rounded-lg border border-line bg-white p-5 shadow-sm"
+      className="flex max-w-2xl flex-col gap-4 rounded-lg border border-line bg-surface p-5 shadow-sm"
     >
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium text-body">Name</label>
@@ -53,7 +53,7 @@ export function WorkflowForm() {
       </div>
 
       {rule.params.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 rounded-md bg-[#f7f9fc] p-3">
+        <div className="grid grid-cols-2 gap-4 rounded-md bg-recessed p-3">
           {rule.params.map((p) => (
             <div key={p.key} className="flex flex-col gap-1">
               <label className="text-sm font-medium text-body">
@@ -108,21 +108,21 @@ export function WorkflowForm() {
         <textarea name="description" rows={2} className={input} />
       </div>
 
-      {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
-      {state?.ok && <p className="text-sm text-emerald-600">{state.ok}</p>}
+      {state?.error && <p className="notice notice--danger">{state.error}</p>}
+      {state?.ok && <p className="notice notice--success">{state.ok}</p>}
 
       <div className="flex gap-2">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-crimson px-4 py-2 text-sm font-medium text-white hover:bg-crimson-hover disabled:opacity-60"
+          className="btn-primary"
         >
           {pending ? "Creating…" : "Create workflow"}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="rounded-md border border-line px-4 py-2 text-sm font-medium text-body hover:bg-[#f1f4f8]"
+          className="btn-outline"
         >
           Cancel
         </button>

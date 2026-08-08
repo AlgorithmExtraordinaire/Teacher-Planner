@@ -88,7 +88,7 @@ export default async function WorkflowsPage() {
                       <input type="hidden" name="id" value={w.id} />
                       <button
                         type="submit"
-                        className="rounded-md bg-crimson px-3 py-1.5 text-sm font-medium text-white hover:bg-crimson-hover"
+                        className="btn-primary btn-sm"
                       >
                         Run now
                       </button>
@@ -103,7 +103,7 @@ export default async function WorkflowsPage() {
                         />
                         <button
                           type="submit"
-                          className="rounded-md border border-line px-3 py-1.5 text-sm font-medium text-body hover:bg-[#f1f4f8]"
+                          className="btn-outline btn-sm"
                         >
                           {w.is_enabled ? "Disable" : "Enable"}
                         </button>
@@ -123,9 +123,9 @@ export default async function WorkflowsPage() {
       {(runs ?? []).length === 0 ? (
         <EmptyState message="No runs yet." />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-line bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-lg border border-line bg-surface shadow-sm">
           <table className="w-full min-w-max text-left text-sm">
-            <thead className="border-b border-line bg-[#f7f9fc]">
+            <thead className="border-b border-line bg-recessed">
               <tr>
                 {["Workflow", "Started", "Status", "Matches", "Alerts", "Summary"].map(
                   (h) => (
@@ -141,7 +141,7 @@ export default async function WorkflowsPage() {
             </thead>
             <tbody className="divide-y divide-line">
               {(runs ?? []).map((r) => (
-                <tr key={r.id} className="hover:bg-[#f7f9fc]">
+                <tr key={r.id} className="hover:bg-recessed">
                   <td className="px-4 py-2.5 text-body">
                     {r.workflows?.name ?? "—"}
                   </td>

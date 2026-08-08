@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/dal";
-import { PageHeader, Card } from "@/components/ui";
+import { PageHeader, Notice } from "@/components/ui";
 import { ResourcePicker } from "@/app/(dashboard)/resources/resource-picker";
 
 export default async function ResourcesPage({
@@ -66,7 +66,7 @@ export default async function ResourcesPage({
         />
         <Link
           href="/resources/folders"
-          className="h-fit rounded-md border border-line px-3 py-2 text-sm font-medium text-body hover:bg-[#f1f4f8]"
+          className="btn-outline h-fit"
         >
           My folders
         </Link>
@@ -74,11 +74,11 @@ export default async function ResourcesPage({
 
       <form className="mb-6 flex flex-wrap items-end gap-3">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-body">Subject</label>
+          <label className="field__label">Subject</label>
           <select
             name="subject"
             defaultValue={subject ?? ""}
-            className="rounded-md border border-line px-3 py-2 text-sm"
+            className="select"
           >
             <option value="">All subjects</option>
             {subjects.map((s) => (
@@ -89,11 +89,11 @@ export default async function ResourcesPage({
           </select>
         </div>
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-body">Grade</label>
+          <label className="field__label">Grade</label>
           <select
             name="grade"
             defaultValue={grade ?? ""}
-            className="rounded-md border border-line px-3 py-2 text-sm"
+            className="select"
           >
             <option value="">All grades</option>
             {grades.map((g) => (
@@ -104,24 +104,24 @@ export default async function ResourcesPage({
           </select>
         </div>
         <div className="flex flex-1 flex-col gap-1">
-          <label className="text-xs font-medium text-body">Search</label>
+          <label className="field__label">Search</label>
           <input
             name="q"
             defaultValue={q ?? ""}
             placeholder="Filename or topic…"
-            className="rounded-md border border-line px-3 py-2 text-sm"
+            className="select"
           />
         </div>
         <button
           type="submit"
-          className="rounded-md bg-crimson px-4 py-2 text-sm font-medium text-white hover:bg-crimson-hover"
+          className="btn-primary"
         >
           Filter
         </button>
         {(subject || grade || q) && (
           <Link
             href="/resources"
-            className="rounded-md border border-line px-4 py-2 text-sm font-medium text-body hover:bg-[#f1f4f8]"
+            className="btn-outline"
           >
             Reset
           </Link>
@@ -129,10 +129,12 @@ export default async function ResourcesPage({
       </form>
 
       {!teacher && (
-        <Card className="mb-4 border-amber-200 bg-amber-50 text-sm text-amber-800">
-          You can browse the catalogue, but filing resources needs a teacher
-          record linked to your account.
-        </Card>
+        <div className="mb-4">
+          <Notice tone="warning">
+            You can browse the catalogue, but filing resources needs a teacher
+            record linked to your account.
+          </Notice>
+        </div>
       )}
 
       <p className="mb-3 text-sm text-body">

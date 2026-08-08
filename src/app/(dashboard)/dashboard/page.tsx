@@ -1,13 +1,15 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/dal";
-import { KpiCard, EmptyState } from "@/components/ui";
+import { KpiCard, EmptyState, Panel, SectionLabel } from "@/components/ui";
 import { Badge } from "@/components/cell";
 
 /**
  * Dashboard Overview.
  *
- * Layout follows the Lean Academy grid: KPI row, a kanban of lesson-plan
- * status, then a dense table of recent approvals.
+ * Follows the template's hero-dashboard layout: a metric row, the primary
+ * panel (lesson preparation, as a three-stage kanban), then a dense table of
+ * recent authorisations.
  *
  * Every figure is read from the database. Nothing here is illustrative — an
  * empty column means the school genuinely has no records of that kind, and
@@ -58,48 +60,60 @@ export default async function DashboardOverviewPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* KPI row */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+    <div className="flex flex-col gap-8">
+      {/* Metric row. The figures that need a decision take the accent or the
+          danger tone; the rest stay neutral, so a coloured figure always
+          means something. */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <KpiCard
           label="Active learners"
-          value={studentCount ?? 0}
-          tone="navy"
+          value={studentCount ?? "—"}
+          note="On the roster today"
         />
         <KpiCard
           label="Classes without a teacher"
-          value={unstaffedClasses ?? 0}
-          tone={unstaffedClasses ? "crimson" : "navy"}
-          note={unstaffedClasses ? "Needs a staffing decision" : "All staffed"}
+          value={unstaffedClasses ?? "—"}
+          tone={unstaffedClasses ? "danger" : "neutral"}
+          note={
+            unstaffedClasses ? "Needs a staffing decision" : "All classes staffed"
+          }
+          trend={unstaffedClasses ? "down" : "up"}
         />
         <KpiCard
-          label="Proposals awaiting approval"
-          value={pendingProposals ?? 0}
-          tone={pendingProposals ? "gold" : "navy"}
+          label="Proposals awaiting review"
+          value={pendingProposals ?? "—"}
+          tone={pendingProposals ? "accent" : "neutral"}
           note={
-            pendingProposals
-              ? "Assistant suggestions pending review"
-              : "Nothing queued"
+            pendingProposals ? "Assistant suggestions pending" : "Queue clear"
           }
+          trend={pendingProposals ? "down" : "up"}
         />
       </div>
 
-      {/* Lesson preparation kanban */}
-      <section>
-        <h2 className="mb-3 text-sm font-semibold text-main">
-          Lesson preparation
-        </h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      {/* Lesson preparation — the page's primary panel. */}
+      <Panel
+        title={
+          <>
+            Lesson preparation, <span className="it">this term</span>
+          </>
+        }
+        meta={`${plans?.length ?? 0} most recent plans`}
+        actions={
+          <Link href="/lesson-plans/new" className="btn-primary btn-sm">
+            Generate a plan →
+          </Link>
+        }
+        raised
+      >
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {columns.map((col) => {
             const items = byStatus(col.key);
             return (
-              <div key={col.key} className="card">
-                <h4 className={`kanban-head ${col.modifier}`}>
+              <div key={col.key}>
+                <h3 className={`kanban-head ${col.modifier}`}>
                   {col.title}
-                  <span className="ml-2 font-normal text-muted">
-                    {items.length}
-                  </span>
-                </h4>
+                  <span className="font-normal">{items.length}</span>
+                </h3>
 
                 {items.length === 0 ? (
                   <p className="mt-4 text-sm text-muted">None.</p>
@@ -107,7 +121,7 @@ export default async function DashboardOverviewPage() {
                   items.slice(0, 6).map((p) => (
                     <div key={p.id} className="kanban-item">
                       <p className="font-medium text-main">{p.title}</p>
-                      <p className="mt-0.5 text-xs text-muted">
+                      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.06em] text-muted">
                         {p.classes?.name ?? "Unassigned class"}
                         {p.lesson_date ? ` · ${p.lesson_date}` : ""}
                       </p>
@@ -116,7 +130,7 @@ export default async function DashboardOverviewPage() {
                 )}
 
                 {items.length > 6 && (
-                  <p className="mt-3 text-xs text-muted">
+                  <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.06em] text-muted">
                     +{items.length - 6} more
                   </p>
                 )}
@@ -124,41 +138,33 @@ export default async function DashboardOverviewPage() {
             );
           })}
         </div>
-      </section>
+      </Panel>
 
-      {/* Recent approvals */}
+      {/* Recent authorisations */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-main">
-          Recent authorisations &amp; approvals
-        </h2>
+        <SectionLabel>Recent authorisations &amp; approvals</SectionLabel>
         {approvals && approvals.length > 0 ? (
-          <div className="card overflow-x-auto p-0">
-            <table className="w-full min-w-max border-collapse text-left text-sm">
+          <div className="table-wrap">
+            <table className="data-table min-w-max">
               <thead>
                 <tr>
-                  {["Item", "Description", "Category", "Status"].map((h) => (
-                    <th
-                      key={h}
-                      className="whitespace-nowrap border-b border-line px-4 py-2 font-semibold text-muted"
-                    >
-                      {h}
-                    </th>
-                  ))}
+                  <th scope="col">Item</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {approvals.map((a) => (
-                  <tr key={a.id} className="hover:bg-surface">
-                    <td className="border-b border-line px-4 py-2 font-mono text-xs text-muted">
+                  <tr key={a.id}>
+                    <td className="cell-num text-muted">
                       #{a.id.slice(0, 8)}
                     </td>
-                    <td className="border-b border-line px-4 py-2 text-main">
-                      {a.rationale ?? "—"}
-                    </td>
-                    <td className="border-b border-line px-4 py-2 capitalize text-main">
+                    <td>{a.rationale ?? <span className="text-muted">—</span>}</td>
+                    <td className="capitalize">
                       {a.action_type.replace(/_/g, " ")}
                     </td>
-                    <td className="border-b border-line px-4 py-2">
+                    <td>
                       <Badge value={a.status} />
                     </td>
                   </tr>

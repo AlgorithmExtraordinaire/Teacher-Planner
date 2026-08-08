@@ -1,3 +1,5 @@
+import Image from "next/image";
+import Link from "next/link";
 import { LoginForm } from "@/app/login/login-form";
 
 export default async function LoginPage({
@@ -8,16 +10,41 @@ export default async function LoginPage({
   const { next } = await searchParams;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-[#f7f9fc] px-4">
-      <div className="flex flex-col items-center gap-1 text-center">
-        <h1 className="text-2xl font-semibold text-ink">
-          Teacher Planner
+    <div className="auth">
+      <Link className="lp-brand" href="/">
+        <Image
+          src="/sca-logo.png"
+          alt="Swakopmund Christian Academy crest"
+          width={44}
+          height={37}
+          priority
+          style={{ height: "auto" }}
+        />
+        <span>
+          <span className="lp-brand__name">Swakopmund Christian Academy</span>
+          <span className="lp-brand__sub">
+            Teacher &amp; Departmental Planner
+          </span>
+        </span>
+      </Link>
+
+      <div className="auth__card">
+        <p className="eyebrow eyebrow--rule mb-3">Staff sign-in</p>
+        <h1 className="auth__title">
+          Welcome <span className="it">back</span>.
         </h1>
-        <p className="text-sm text-body">
-          Swakopmund Christian Academy
+        <p className="mt-2 text-sm text-muted">
+          Accounts are issued by IT Operations and scoped to your role.
         </p>
+
+        <div className="mt-6">
+          <LoginForm next={next ?? "/"} />
+        </div>
       </div>
-      <LoginForm next={next ?? "/"} />
+
+      <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+        By His Power · For His Glory
+      </p>
     </div>
   );
 }

@@ -61,7 +61,7 @@ export default async function ConversationPage({
         >
           ← Conversations
         </Link>
-        <span className="rounded-md bg-[#f1f4f8] px-2 py-1 text-xs font-medium text-body">
+        <span className="rounded-md bg-recessed px-2 py-1 text-xs font-medium text-body">
           {specialist.label}
         </span>
       </div>

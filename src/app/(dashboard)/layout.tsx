@@ -1,18 +1,20 @@
+import Link from "next/link";
 import { requireUser, isSuperadmin } from "@/lib/dal";
 import { logout } from "@/app/login/actions";
 import { NavLink } from "@/app/(dashboard)/nav-link";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { Ticker, type TickerItem } from "@/components/ticker";
+import { createClient } from "@/lib/supabase/server";
 
 const NAV_SECTIONS = [
   {
-    label: "Dashboards",
+    label: "§01 — Planning",
     items: [
       { href: "/dashboard", label: "Dashboard Overview" },
       { href: "/lesson-plans/new", label: "Lesson Plan Generator" },
     ],
   },
   {
-    label: "Intelligence",
+    label: "§02 — Intelligence",
     items: [
       { href: "/agent", label: "Assistant" },
       { href: "/agent/proposals", label: "Proposals" },
@@ -20,14 +22,14 @@ const NAV_SECTIONS = [
     ],
   },
   {
-    label: "Resources",
+    label: "§03 — Resources",
     items: [
       { href: "/resources", label: "Curriculum Catalogue" },
       { href: "/resources/folders", label: "My Folders" },
     ],
   },
   {
-    label: "Records",
+    label: "§04 — Records",
     items: [
       { href: "/roster", label: "Roster" },
       { href: "/calendar", label: "Academic Calendar" },
@@ -42,9 +44,77 @@ const NAV_SECTIONS = [
 // Superadmin only. Hiding it is a courtesy, not the control — RLS is what
 // stops anyone else reading settings, schools, or the audit log.
 const PLATFORM_SECTION = {
-  label: "Platform",
+  label: "§05 — Platform",
   items: [{ href: "/admin/settings", label: "Settings & Audit" }],
 };
+
+/**
+ * Figures for the ticker strip.
+ *
+ * Read live, with `head: true` so each is a COUNT and no rows cross the
+ * wire. Every query runs under the caller's RLS policies, so a teacher's
+ * strip reflects what a teacher may see rather than school-wide totals.
+ *
+ * A null count means the query failed or the table is empty. It is rendered
+ * as "—", not as 0: those are different claims, and quietly reporting zero
+ * learners because a policy denied the read would be a lie in a prominent
+ * position.
+ */
+async function readTickerFigures(): Promise<TickerItem[]> {
+  const supabase = await createClient();
+  const today = new Date().toISOString().slice(0, 10);
+
+  const [learners, classes, unstaffed, plans, pending, standards, upcoming] =
+    await Promise.all([
+      supabase
+        .from("students")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "active"),
+      supabase.from("classes").select("*", { count: "exact", head: true }),
+      supabase
+        .from("classes")
+        .select("*", { count: "exact", head: true })
+        .is("teacher_id", null),
+      supabase.from("lesson_plans").select("*", { count: "exact", head: true }),
+      supabase
+        .from("agent_actions")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending"),
+      supabase
+        .from("curriculum_standards")
+        .select("*", { count: "exact", head: true }),
+      supabase
+        .from("academic_calendar")
+        .select("*", { count: "exact", head: true })
+        .eq("day_type", "school_day")
+        .gte("date", today),
+    ]);
+
+  const fig = (n: number | null) => (n === null ? "—" : n.toLocaleString());
+
+  return [
+    { symbol: "LEARNERS", value: fig(learners.count) },
+    {
+      symbol: "CLASSES",
+      value: fig(classes.count),
+      delta: unstaffed.count ? `${unstaffed.count} unstaffed` : "all staffed",
+      direction: unstaffed.count ? "down" : "up",
+    },
+    { symbol: "LESSON-PLANS", value: fig(plans.count) },
+    {
+      symbol: "PROPOSALS",
+      value: fig(pending.count),
+      delta: pending.count ? "awaiting review" : "clear",
+      direction: pending.count ? "down" : "up",
+    },
+    { symbol: "STANDARDS", value: fig(standards.count) },
+    {
+      symbol: "SCHOOL-DAYS-LEFT",
+      value: fig(upcoming.count),
+      delta: "2026 calendar",
+    },
+  ];
+}
 
 export default async function DashboardLayout({
   children,
@@ -56,89 +126,83 @@ export default async function DashboardLayout({
     ? [...NAV_SECTIONS, PLATFORM_SECTION]
     : NAV_SECTIONS;
 
-  return (
-    // App shell: sidebar fixed, workspace scrolls. Constrained here rather
-    // than on <body> so the login page can still scroll on a short viewport.
-    <div className="flex h-screen overflow-hidden">
-      <aside
-        className="hidden w-[260px] shrink-0 flex-col gap-8 overflow-y-auto px-6 py-8 md:flex"
-        style={{
-          backgroundColor: "var(--bg-sidebar)",
-          color: "var(--sidebar-fg)",
-          borderRight: "var(--border-width) solid var(--border-color)",
-        }}
-      >
-        <div>
-          <h2 className="text-base font-semibold leading-tight">
-            Swakopmund Christian Academy
-          </h2>
-          <small
-            className="text-xs"
-            style={{ color: "var(--sidebar-active)" }}
-          >
-            Academic Officer Portal
-          </small>
-        </div>
+  const ticker = await readTickerFigures();
 
-        <nav className="flex flex-1 flex-col gap-6">
-          {sections.map((section) => (
-            <div key={section.label}>
-              <p
-                className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em]"
-                style={{ color: "var(--sidebar-muted)" }}
-              >
-                {section.label}
-              </p>
-              <ul className="flex list-none flex-col gap-3">
-                {section.items.map((item) => (
-                  <li key={item.href}>
-                    <NavLink href={item.href} label={item.label} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+  const brand = (
+    <Link className="side__brand" href="/dashboard">
+      <span className="mark" aria-hidden="true" />
+      <span>
+        <span className="side__brand-name">
+          Swakopmund Christian Academy
+        </span>
+        <span className="side__brand-sub">
+          {isSuperadmin(user) ? "Academic Officer" : "Teacher Portal"}
+        </span>
+      </span>
+    </Link>
+  );
+
+  const navTree = sections.map((section) => (
+    <div key={section.label}>
+      <p className="side__section-label">{section.label}</p>
+      <ul className="flex list-none flex-col gap-0.5">
+        {section.items.map((item) => (
+          <li key={item.href}>
+            <NavLink href={item.href} label={item.label} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  ));
+
+  return (
+    // App shell: the sidebar is fixed and the workspace scrolls. Constrained
+    // here rather than on <body> so the login page can still scroll on a
+    // short viewport.
+    <div className="shell-frame">
+      <aside className="side">
+        {brand}
+        <nav aria-label="Primary" className="flex flex-1 flex-col gap-6">
+          {navTree}
         </nav>
       </aside>
 
-      <main
-        className="flex flex-1 flex-col overflow-y-auto"
-        style={{ backgroundColor: "var(--bg-app)" }}
-      >
-        <header
-          className="flex flex-wrap items-center justify-between gap-4 px-8 py-4"
-          style={{
-            backgroundColor: "var(--bg-surface)",
-            borderBottom: "1px solid var(--border-color)",
-          }}
-        >
+      <div className="workspace">
+        {/* Below 900px the sidebar is hidden, so the same route list is
+            emitted as a <details> disclosure. No JavaScript and no second
+            copy of the nav definition. */}
+        <details className="side-mobile">
+          <summary>Menu</summary>
+          <nav aria-label="Primary (compact)" className="side-mobile__panel">
+            {brand}
+            {navTree}
+          </nav>
+        </details>
+
+        <header className="workspace__header">
           <div>
-            <h1 className="text-xl font-semibold">
-              {user.role === "superadmin"
+            <h1 className="workspace__title">
+              {isSuperadmin(user)
                 ? "Academic Officer Dashboard"
                 : "Teacher Planner"}
             </h1>
-            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              {user.full_name} ·{" "}
-              <span className="capitalize">
-                {user.role.replace("_", " ")}
-              </span>
+            <p className="workspace__meta">
+              {user.full_name} · {user.role.replace(/_/g, " ")}
               {user.grade_band ? ` · ${user.grade_band}` : ""}
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <ThemeSwitcher />
-            <form action={logout}>
-              <button type="submit" className="btn-primary">
-                Sign out
-              </button>
-            </form>
-          </div>
+          <form action={logout}>
+            <button type="submit" className="btn-outline">
+              Sign out
+            </button>
+          </form>
         </header>
 
-        <div className="p-8">{children}</div>
-      </main>
+        <Ticker items={ticker} />
+
+        <div className="workspace__body">{children}</div>
+      </div>
     </div>
   );
 }

@@ -51,16 +51,16 @@ export function SettingRow({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md border border-line px-3 py-1.5 text-sm font-medium text-body hover:bg-[#f1f4f8] disabled:opacity-50"
+          className="btn-outline btn-sm"
         >
           {pending ? "Saving…" : "Save"}
         </button>
       </div>
 
       {state?.error && (
-        <p className="text-sm text-red-600">{state.error}</p>
+        <p className="notice notice--danger">{state.error}</p>
       )}
-      {state?.ok && <p className="text-sm text-emerald-700">{state.ok}</p>}
+      {state?.ok && <p className="notice notice--success">{state.ok}</p>}
     </form>
   );
 }

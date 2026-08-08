@@ -13,25 +13,25 @@ export function FolderForm({
   return (
     <form
       action={action}
-      className="flex flex-wrap items-end gap-3 rounded-lg border border-line bg-white p-4 shadow-sm"
+      className="flex flex-wrap items-end gap-3 rounded-lg border border-line bg-surface p-4 shadow-sm"
     >
       <div className="flex flex-1 flex-col gap-1">
-        <label className="text-xs font-medium text-body">
+        <label className="field__label">
           New folder
         </label>
         <input
           name="name"
           required
           placeholder="e.g. Term 3 — Multiplication"
-          className="rounded-md border border-line px-3 py-2 text-sm focus:border-crimson focus:outline-none"
+          className="input"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-body">Inside</label>
+        <label className="field__label">Inside</label>
         <select
           name="parent_id"
           defaultValue=""
-          className="rounded-md border border-line px-3 py-2 text-sm"
+          className="select"
         >
           <option value="">Top level</option>
           {parents.map((p) => (
@@ -44,16 +44,16 @@ export function FolderForm({
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-crimson px-4 py-2 text-sm font-medium text-white hover:bg-crimson-hover disabled:opacity-60"
+        className="btn-primary"
       >
         {pending ? "Creating…" : "Create"}
       </button>
 
       {state?.error && (
-        <p className="w-full text-sm text-red-600">{state.error}</p>
+        <p className="notice notice--danger w-full">{state.error}</p>
       )}
       {state?.ok && (
-        <p className="w-full text-sm text-emerald-600">{state.ok}</p>
+        <p className="notice notice--success w-full">{state.ok}</p>
       )}
     </form>
   );

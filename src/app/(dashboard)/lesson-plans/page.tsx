@@ -20,7 +20,7 @@ export default async function LessonPlansPage() {
         />
         <Link
           href="/lesson-plans/new"
-          className="h-fit rounded-md bg-crimson px-4 py-2 text-sm font-medium text-white hover:bg-crimson-hover"
+          className="btn-primary h-fit"
         >
           + Generate lesson plan
         </Link>

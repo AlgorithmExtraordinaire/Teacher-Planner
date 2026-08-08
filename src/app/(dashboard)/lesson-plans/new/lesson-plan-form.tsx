@@ -114,12 +114,12 @@ export function LessonPlanForm({ classes }: { classes: ClassOption[] }) {
         </p>
       </Field>
 
-      {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
+      {state?.error && <p className="notice notice--danger">{state.error}</p>}
 
       <button
         type="submit"
         disabled={pending}
-        className="w-fit rounded-md bg-crimson px-4 py-2 text-sm font-medium text-white hover:bg-crimson-hover disabled:opacity-60"
+        className="btn-primary w-fit"
       >
         {pending ? "Saving…" : "Save lesson plan"}
       </button>
