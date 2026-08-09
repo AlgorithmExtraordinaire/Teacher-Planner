@@ -8,6 +8,74 @@ export type LessonPlanState = { error?: string } | undefined;
 
 const TIERS = ["annual", "term", "monthly", "weekly", "daily"] as const;
 
+export type StandardOption = {
+  id: string;
+  code: string;
+  description: string | null;
+  domain: string | null;
+  suggested: boolean;
+};
+
+/**
+ * Candidate standards for a module, for the picker in the form.
+ *
+ * Server Functions are reachable by direct POST, not only through our own UI,
+ * so this authenticates on every call exactly like a route handler would.
+ * Standards are not secret, but an unauthenticated data endpoint is still an
+ * endpoint nobody signed up for.
+ *
+ * `suggestedDomains` are keyword guesses from the module title. They mark
+ * rows as suggested; they never filter anything out. A teacher planning a
+ * cross-domain lesson must still be able to reach every standard in the
+ * grade, so a wrong guess costs a scroll rather than a missing option.
+ */
+export async function standardsForModule(
+  subject: string | null,
+  gradeLevel: string | null,
+  suggestedDomains: string[],
+): Promise<StandardOption[]> {
+  await requireUser();
+
+  if (!gradeLevel) return [];
+
+  const supabase = await createClient();
+
+  // Framework follows the subject; a maths module must not offer ELA codes.
+  const frameworks =
+    subject === "Mathematics"
+      ? ["CCSS-M"]
+      : subject === "English Language Arts"
+        ? ["CCSS-ELA"]
+        : subject === "Science"
+          ? ["Utah SEEd"]
+          : [];
+
+  let query = supabase
+    .from("curriculum_standards")
+    .select("id, code, description, domain")
+    .eq("grade_level", gradeLevel)
+    .order("code");
+
+  if (frameworks.length > 0) query = query.in("framework", frameworks);
+
+  const { data, error } = await query.limit(400);
+  if (error || !data) return [];
+
+  const hinted = new Set(suggestedDomains);
+
+  return data
+    .map((s) => ({ ...s, suggested: s.domain ? hinted.has(s.domain) : false }))
+    // Suggested first, then by code, so the likely picks are reachable
+    // without scrolling but nothing is hidden.
+    .sort((a, b) =>
+      a.suggested === b.suggested
+        ? a.code.localeCompare(b.code, undefined, { numeric: true })
+        : a.suggested
+          ? -1
+          : 1,
+    );
+}
+
 export async function createLessonPlan(
   _prevState: LessonPlanState,
   formData: FormData,
@@ -31,6 +99,7 @@ export async function createLessonPlan(
   const title = String(formData.get("title") ?? "").trim();
   const tier = String(formData.get("tier") ?? "");
   const classId = String(formData.get("class_id") ?? "") || null;
+  const moduleId = String(formData.get("curriculum_module_id") ?? "") || null;
   const lessonDate = String(formData.get("lesson_date") ?? "") || null;
   const objective = String(formData.get("objective") ?? "");
 
@@ -43,10 +112,19 @@ export async function createLessonPlan(
   // The old text[] accepted any string, so a typo looked identical to a valid
   // citation and quietly broke coverage reporting. An unrecognised code now
   // fails the save with the offending code named.
-  const codes = String(formData.get("standards") ?? "")
-    .split(",")
-    .map((c) => c.trim())
-    .filter(Boolean);
+  // getAll, not get: the picker submits one `standards` entry per ticked
+  // checkbox, while the free-text escape hatch submits one comma-separated
+  // entry. Reading only the first value would silently drop every standard
+  // after the first — a plan that looks aligned and is not.
+  const codes = [
+    ...new Set(
+      formData
+        .getAll("standards")
+        .flatMap((v) => String(v).split(","))
+        .map((c) => c.trim())
+        .filter(Boolean),
+    ),
+  ];
 
   let standardIds: string[] = [];
 
@@ -75,6 +153,11 @@ export async function createLessonPlan(
     .insert({
       teacher_id: teacher.id,
       class_id: classId,
+      // Written for the first time here. The column has existed since the
+      // initial schema and nothing ever populated it, so every plan was
+      // untraceable to the curriculum it came from and pacing coverage could
+      // not be computed at all.
+      curriculum_module_id: moduleId,
       title,
       tier,
       lesson_date: lessonDate,
