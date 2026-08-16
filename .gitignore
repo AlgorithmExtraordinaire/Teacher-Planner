@@ -37,6 +37,10 @@ yarn-error.log*
 # Real staff roster — names and school email addresses. The example stays.
 scripts/staff_roster.json
 
+# Data snapshots. These contain every learner record in the school and must
+# never reach the repository. They live on the droplet beside the checkout.
+/backups/
+
 # vercel
 .vercel
 
