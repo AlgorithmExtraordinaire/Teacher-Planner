@@ -5,6 +5,7 @@
 # returns. Both are checked out on Windows here and run on Ubuntu there.
 *.sh      text eol=lf
 *.py      text eol=lf
+*.mjs     text eol=lf
 *.service text eol=lf
 *.timer   text eol=lf
 Dockerfile text eol=lf

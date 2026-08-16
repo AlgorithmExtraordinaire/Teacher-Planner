@@ -1,11 +1,21 @@
 import Link from "next/link";
-import { requireUser, isSuperadmin } from "@/lib/dal";
+import { requireUser, isSuperadmin, isStaffAdmin } from "@/lib/dal";
 import { logout } from "@/app/login/actions";
 import { NavLink } from "@/app/(dashboard)/nav-link";
 import { Ticker, type TickerItem } from "@/components/ticker";
 import { createClient } from "@/lib/supabase/server";
 
-const NAV_SECTIONS = [
+/**
+ * `staffOnly` hides an entry from teachers. Like the platform section below,
+ * this is decluttering rather than access control — the pages themselves
+ * already hide every control a teacher cannot operate, and RLS is the real
+ * boundary. A teacher who types the URL still reads the page, which is
+ * intended: nothing there is secret, it is simply not theirs to act on.
+ */
+type NavItem = { href: string; label: string; staffOnly?: boolean };
+type NavSection = { label: string; items: NavItem[]; staffOnly?: boolean };
+
+const NAV_SECTIONS: NavSection[] = [
   {
     label: "§01 — Planning",
     items: [
@@ -14,7 +24,11 @@ const NAV_SECTIONS = [
     ],
   },
   {
+    // Hidden from teachers for the pilot. The Assistant is teacher-safe — its
+    // reads run under the caller's session — so if the pilot wants feedback on
+    // it, move that one item into §01 rather than unhiding the section.
     label: "§02 — Intelligence",
+    staffOnly: true,
     items: [
       { href: "/agent", label: "Assistant" },
       { href: "/agent/proposals", label: "Proposals" },
@@ -36,14 +50,14 @@ const NAV_SECTIONS = [
       { href: "/standards", label: "Curriculum Standards" },
       { href: "/lesson-plans", label: "Lesson Plans" },
       { href: "/assessments", label: "Assessments" },
-      { href: "/tables", label: "All Tables" },
+      { href: "/tables", label: "All Tables", staffOnly: true },
     ],
   },
 ];
 
 // Superadmin only. Hiding it is a courtesy, not the control — RLS is what
 // stops anyone else reading settings, schools, or the audit log.
-const PLATFORM_SECTION = {
+const PLATFORM_SECTION: NavSection = {
   label: "§05 — Platform",
   items: [{ href: "/admin/settings", label: "Settings & Audit" }],
 };
@@ -122,9 +136,18 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await requireUser();
-  const sections = isSuperadmin(user)
-    ? [...NAV_SECTIONS, PLATFORM_SECTION]
-    : NAV_SECTIONS;
+  const staff = isStaffAdmin(user);
+  const sections = (
+    isSuperadmin(user) ? [...NAV_SECTIONS, PLATFORM_SECTION] : NAV_SECTIONS
+  )
+    .filter((section) => staff || !section.staffOnly)
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => staff || !item.staffOnly),
+    }))
+    // A section whose every item was filtered away would render as a bare
+    // heading over nothing.
+    .filter((section) => section.items.length > 0);
 
   const ticker = await readTickerFigures();
 

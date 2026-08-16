@@ -1,0 +1,14 @@
+[
+  {
+    "_comment": "Copy to scripts/staff_roster.json (git-ignored) and fill in real staff. Run `audit` first to get teacher_id values.",
+    "teacher_id": "paste-the-uuid-from-audit",
+    "email": "teacher@elearning-swakopca.edu.na",
+    "role": "teacher",
+    "grade_band": null
+  },
+  {
+    "teacher_name": "Exact Name As It Appears In The Teachers Table",
+    "email": "gradelead@elearning-swakopca.edu.na",
+    "role": "grade_lead"
+  }
+]

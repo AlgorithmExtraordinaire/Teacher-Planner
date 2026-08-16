@@ -34,6 +34,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# Real staff roster — names and school email addresses. The example stays.
+scripts/staff_roster.json
+
 # vercel
 .vercel
 

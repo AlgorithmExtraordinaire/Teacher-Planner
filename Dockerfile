@@ -36,4 +36,16 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
+# Probes "/" — the prerendered landing page — deliberately, because it needs no
+# database. A health check that failed when Supabase blipped would report the
+# app as broken when the app is fine, and restarting the container would not
+# bring the database back. This answers one question only: is the Node process
+# still serving HTTP?
+#
+# Docker marks the container unhealthy; it does not restart it. That makes a
+# wedged process visible in `docker ps` instead of invisible. Automatic
+# recovery needs a supervisor and is a separate decision.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD wget --quiet --spider --tries=1 http://127.0.0.1:3000/ || exit 1
+
 CMD ["node", "server.js"]
