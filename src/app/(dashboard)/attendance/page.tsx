@@ -88,8 +88,8 @@ export default async function AttendancePage({
 
   const [
     { data: enrolment },
-    { data: marks },
-    { count: recordedDays, error: tableError },
+    { data: marks, error: marksError },
+    { count: recordedDays },
   ] = await Promise.all([
       supabase
         .from("class_enrollment")
@@ -101,7 +101,10 @@ export default async function AttendancePage({
             .select("student_id, status")
             .eq("class_id", selectedClass.id)
             .eq("date", selectedDate)
-        : Promise.resolve({ data: [] as { student_id: string; status: string }[] }),
+        : Promise.resolve({
+            data: [] as { student_id: string; status: string }[],
+            error: null,
+          }),
       supabase
         .from("attendance")
         .select("date", { count: "exact", head: true })
@@ -109,12 +112,17 @@ export default async function AttendancePage({
     ]);
 
   // The register depends on migration 0020. Until it is applied the table does
-  // not exist, and an empty grid that silently refuses to save is a worse
-  // experience than being told why.
+  // not exist, and a grid that looks fine and silently refuses to save is
+  // worse than being told why.
+  //
+  // Detected on the marks query, NOT on the count above: the count uses
+  // head:true, so PostgREST returns no body, so there is no message to match
+  // and a missing table reads as success. That is exactly how this page first
+  // shipped a working-looking register for a table that did not exist.
   const tableMissing =
-    Boolean(tableError) &&
+    Boolean(marksError) &&
     /does not exist|schema cache|PGRST205|42P01/i.test(
-      `${tableError?.message} ${tableError?.code}`,
+      `${marksError?.message} ${marksError?.code}`,
     );
 
   const markByStudent = new Map(
