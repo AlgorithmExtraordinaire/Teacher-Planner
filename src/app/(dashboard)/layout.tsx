@@ -21,16 +21,22 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { href: "/dashboard", label: "Dashboard Overview" },
       { href: "/lesson-plans/new", label: "Lesson Plan Generator" },
+      { href: "/attendance", label: "Attendance Register" },
+      { href: "/curriculum-position", label: "Curriculum Position" },
+      // Teacher-safe: its reads run under the caller's session, and its writes
+      // are proposals a staff admin must approve. It also answers "how do I do
+      // X here", which is why it belongs with the tools rather than behind an
+      // admin gate.
+      { href: "/agent", label: "Assistant" },
     ],
   },
   {
-    // Hidden from teachers for the pilot. The Assistant is teacher-safe — its
-    // reads run under the caller's session — so if the pilot wants feedback on
-    // it, move that one item into §01 rather than unhiding the section.
+    // Review and automation surfaces. The Assistant itself now lives in §01
+    // with the teacher's other tools; what stays here is what only a staff
+    // admin can act on — approving proposals and running workflows.
     label: "§02 — Intelligence",
     staffOnly: true,
     items: [
-      { href: "/agent", label: "Assistant" },
       { href: "/agent/proposals", label: "Proposals" },
       { href: "/workflows", label: "Workflows" },
     ],
@@ -50,6 +56,7 @@ const NAV_SECTIONS: NavSection[] = [
       { href: "/standards", label: "Curriculum Standards" },
       { href: "/lesson-plans", label: "Lesson Plans" },
       { href: "/assessments", label: "Assessments" },
+      { href: "/admin/staff", label: "Staff Accounts", staffOnly: true },
       { href: "/tables", label: "All Tables", staffOnly: true },
     ],
   },

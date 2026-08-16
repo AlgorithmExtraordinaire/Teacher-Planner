@@ -31,6 +31,11 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const isAuthRoute = path.startsWith("/login");
+  // Recovery has to work for someone who cannot sign in — that is its whole
+  // purpose. Kept separate from isAuthRoute because a signed-in user IS
+  // allowed here: that is how you change a password you still know.
+  const isRecovery =
+    path.startsWith("/forgot-password") || path.startsWith("/reset-password");
   const isPublicAsset =
     path.startsWith("/_next") || path.startsWith("/favicon");
   // Machine-to-machine: called by the scheduler with a bearer secret, never by
@@ -42,7 +47,7 @@ export async function updateSession(request: NextRequest) {
   // unreachable to the people it exists for.
   const isLanding = path === "/";
 
-  if (!user && !isAuthRoute && !isPublicAsset && !isCron && !isLanding) {
+  if (!user && !isAuthRoute && !isPublicAsset && !isCron && !isLanding && !isRecovery) {
     const redirectUrl = new URL("/login", request.url);
     redirectUrl.searchParams.set("next", path);
     return NextResponse.redirect(redirectUrl);

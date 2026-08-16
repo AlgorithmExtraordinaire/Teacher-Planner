@@ -209,8 +209,23 @@ export const TABLES: TableSpec[] = [
     orderBy: { column: "created_at", ascending: false },
   },
   {
+    name: "attendance",
+    label: "Daily Register",
+    group: "Assessment",
+    description:
+      "Daily attendance marks from Term 3 2026 onward. The per-term totals in Attendance cover the first semester and are a separate record.",
+    columns: [
+      { key: "date", label: "Date", kind: "date" },
+      { key: "status", label: "Status", kind: "badge" },
+      { key: "note", label: "Note" },
+      { key: "created_at", label: "First marked", kind: "date" },
+      { key: "updated_at", label: "Last changed", kind: "date" },
+    ],
+    orderBy: { column: "date", ascending: false },
+  },
+  {
     name: "attendance_summary",
-    label: "Attendance",
+    label: "Attendance (per term)",
     group: "Assessment",
     description: "Per-term attendance totals, as published on report cards.",
     columns: [

@@ -6,6 +6,7 @@ import {
   standardsForModule,
   type StandardOption,
 } from "@/app/(dashboard)/lesson-plans/new/actions";
+import { generateOutline } from "@/app/(dashboard)/lesson-plans/new/generate";
 import {
   buildPlan,
   suggestedDomains,
@@ -13,6 +14,9 @@ import {
   type CurriculumModule,
   type PlanTier,
 } from "@/lib/curriculum/autofill";
+
+/** Subjects with loaded standards; mirrors SUPPORTED_SUBJECTS in generate.ts. */
+const AI_SUBJECTS = ["English Language Arts", "Mathematics", "Science"];
 
 type ClassOption = {
   id: string;
@@ -135,6 +139,39 @@ export function LessonPlanForm({
   const suggestedCount = standards.filter((s) => s.suggested).length;
   const noModules = Boolean(selectedClass) && availableModules.length === 0;
 
+  const [drafting, setDrafting] = useState(false);
+  const [draftError, setDraftError] = useState<string | null>(null);
+  const [draftedFrom, setDraftedFrom] = useState<string[] | null>(null);
+
+  const aiAvailable =
+    Boolean(moduleId) &&
+    Boolean(selectedClass?.subject) &&
+    AI_SUBJECTS.includes(selectedClass!.subject!);
+
+  async function draftOutline() {
+    if (!selectedClass) return;
+    setDrafting(true);
+    setDraftError(null);
+    setDraftedFrom(null);
+
+    const result = await generateOutline({
+      classId: selectedClass.id,
+      moduleId,
+      standardCodes: [...picked],
+    });
+
+    setDrafting(false);
+    if (!result.ok) {
+      setDraftError(result.error);
+      return;
+    }
+
+    // Merged, not replaced: the title and materials came from the module and
+    // are facts about the curriculum. The draft only touches the teaching.
+    setFields((f) => ({ ...f, ...result.outline }));
+    setDraftedFrom(result.grounding);
+  }
+
   return (
     <form action={action} className="flex max-w-2xl flex-col gap-5">
       {/* ---------------------------------------------- 1. what is being planned */}
@@ -219,6 +256,46 @@ export function LessonPlanForm({
           class. The fields below still work — fill them in directly, and
           standards can be added by code.
         </p>
+      )}
+
+      {/* ------------------------------------------- 1b. optional AI first draft */}
+      {moduleId && (
+        <div className="rounded-md border border-line bg-recessed p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium text-ink">
+                Draft the teaching with the Assistant
+              </p>
+              <p className="mt-0.5 text-xs text-muted">
+                {aiAvailable
+                  ? "Uses this module and the standards you have ticked. It writes the teaching only — no resources, because those live in e-learning."
+                  : `Available for ${AI_SUBJECTS.join(", ")} only. Other subjects have no loaded standards to plan against.`}
+              </p>
+            </div>
+            {/* type="button": inside a form, the default is submit, which would
+                save a half-empty plan instead of drafting one. */}
+            <button
+              type="button"
+              onClick={draftOutline}
+              disabled={!aiAvailable || drafting}
+              className="btn-outline btn-sm disabled:opacity-50"
+            >
+              {drafting ? "Drafting…" : "Draft outline"}
+            </button>
+          </div>
+
+          {draftError && (
+            <p role="alert" className="mt-3 notice notice--danger">
+              {draftError}
+            </p>
+          )}
+          {draftedFrom && (
+            <p role="status" className="mt-3 text-xs text-body">
+              Draft written against {draftedFrom.join(", ")}. Read it before you
+              save it — it is a starting point, not a lesson.
+            </p>
+          )}
+        </div>
       )}
 
       {/* ---------------------------------------------------- 2. the plan itself */}

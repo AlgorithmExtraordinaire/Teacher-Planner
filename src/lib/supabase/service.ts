@@ -7,12 +7,20 @@ import type { Database } from "@/lib/supabase/types";
  *
  * This bypasses Row Level Security completely, so it is deliberately NOT the
  * default client. Use it only from a trusted server entry point that has
- * already authenticated its caller by some other means — currently just the
- * cron runner, which verifies `CRON_SECRET` before it gets here.
+ * already authenticated its caller by some other means.
  *
- * Never import this from a Server Component, a Server Action, or anything
- * reachable by a browser session: those all carry a user JWT and must keep
- * going through `@/lib/supabase/server` so RLS stays in force.
+ * Two callers qualify:
+ *
+ *   1. The cron runner, which verifies `CRON_SECRET` before it gets here.
+ *   2. Staff password resets in `admin/staff/actions.ts`, which call
+ *      `requireStaffAdmin()` first and then touch ONLY the Auth admin API.
+ *
+ * (2) is a deliberate amendment to the original "never from a Server Action"
+ * rule. Creating and repairing accounts is not something any user session may
+ * do — no RLS policy can grant it — so an admin-initiated reset has no other
+ * route. The narrowness is what keeps it safe: that action reads no school
+ * data through this client and writes none. Anything that touches learner
+ * records must still go through `@/lib/supabase/server` so RLS stays in force.
  */
 export function createServiceClient() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
