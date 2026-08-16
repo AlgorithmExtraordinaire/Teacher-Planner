@@ -121,41 +121,38 @@ export async function generateOutline(input: {
     };
   }
 
-  // Ground on the standards the teacher actually ticked. If they ticked none,
-  // fall back to the grade's codes for this subject so the outline still cites
-  // something real rather than inventing an objective.
-  let standards: { code: string; description: string | null }[] = [];
-
-  if (input.standardCodes.length > 0) {
-    const { data } = await supabase
-      .from("curriculum_standards")
-      .select("code, description")
-      .in("code", input.standardCodes)
-      .limit(20);
-    standards = data ?? [];
+  // Ground ONLY on the standards the teacher ticked.
+  //
+  // An earlier version fell back to the grade's first codes when nothing was
+  // ticked, so that it always had something real to cite. Testing showed why
+  // that is worse than refusing: for the module "Sums and Differences to 10"
+  // the fallback supplied geometry and measurement codes, and the model
+  // dutifully wrote a coherent lesson about partitioning shapes. Every code in
+  // it was genuine and the plan contradicted its own module.
+  //
+  // Which standards a lesson addresses is the teacher's judgement, exactly as
+  // the standards picker already assumes — it surfaces suggestions and ticks
+  // nothing, because attaching alignment from a keyword guess fabricates it.
+  if (input.standardCodes.length === 0) {
+    return {
+      ok: false,
+      error:
+        "Tick the standards this lesson addresses first. The draft is written against those codes, and choosing them for you would align the plan to something you did not pick.",
+    };
   }
 
-  if (standards.length === 0) {
-    const framework =
-      cls.subject === "Mathematics"
-        ? "CCSS-M"
-        : cls.subject === "English Language Arts"
-          ? "CCSS-ELA"
-          : "Utah SEEd";
-    const { data } = await supabase
-      .from("curriculum_standards")
-      .select("code, description")
-      .eq("grade_level", cls.grade_level ?? "")
-      .eq("framework", framework)
-      .order("code")
-      .limit(12);
-    standards = data ?? [];
-  }
+  const { data: standardRows } = await supabase
+    .from("curriculum_standards")
+    .select("code, description")
+    .in("code", input.standardCodes)
+    .limit(20);
+
+  const standards = standardRows ?? [];
 
   if (standards.length === 0) {
     return {
       ok: false,
-      error: `No standards are loaded for ${cls.subject} at ${cls.grade_level ?? "this grade"}, so there is nothing to plan against.`,
+      error: "None of the ticked codes resolve to the standards library.",
     };
   }
 

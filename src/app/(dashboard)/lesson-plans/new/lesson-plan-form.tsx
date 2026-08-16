@@ -143,10 +143,12 @@ export function LessonPlanForm({
   const [draftError, setDraftError] = useState<string | null>(null);
   const [draftedFrom, setDraftedFrom] = useState<string[] | null>(null);
 
-  const aiAvailable =
-    Boolean(moduleId) &&
-    Boolean(selectedClass?.subject) &&
-    AI_SUBJECTS.includes(selectedClass!.subject!);
+  const aiSubject =
+    Boolean(selectedClass?.subject) && AI_SUBJECTS.includes(selectedClass!.subject!);
+  // Standards must be ticked before drafting: the outline is written against
+  // those codes, and picking them automatically would align the plan to
+  // something the teacher never chose.
+  const aiAvailable = Boolean(moduleId) && aiSubject && picked.size > 0;
 
   async function draftOutline() {
     if (!selectedClass) return;
@@ -267,9 +269,11 @@ export function LessonPlanForm({
                 Draft the teaching with the Assistant
               </p>
               <p className="mt-0.5 text-xs text-muted">
-                {aiAvailable
-                  ? "Uses this module and the standards you have ticked. It writes the teaching only — no resources, because those live in e-learning."
-                  : `Available for ${AI_SUBJECTS.join(", ")} only. Other subjects have no loaded standards to plan against.`}
+                {!aiSubject
+                  ? `Available for ${AI_SUBJECTS.join(", ")} only. Other subjects have no loaded standards to plan against.`
+                  : picked.size === 0
+                    ? "Tick the standards this lesson addresses below, then draft. The outline is written against those codes."
+                    : `Writes the teaching against ${picked.size} ticked standard${picked.size === 1 ? "" : "s"} — no resources, because those live in e-learning.`}
               </p>
             </div>
             {/* type="button": inside a form, the default is submit, which would
