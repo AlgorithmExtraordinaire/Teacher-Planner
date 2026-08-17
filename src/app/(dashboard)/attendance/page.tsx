@@ -4,12 +4,23 @@ import { PageHeader, Card, EmptyState, Notice, StatTile } from "@/components/ui"
 import { RegisterForm, type Learner } from "./register-form";
 
 /**
- * Term labels as they appear in academic_calendar.term. Kept as a constant
- * rather than derived, because "which terms are open for marking" is a school
- * decision, not a fact about the data: when Term 1 2027 is loaded, someone
- * should have to decide to open it.
+ * Terms open for marking, with the school day count from the printed academy
+ * calendar beside each.
+ *
+ * Kept as a constant rather than derived, because "which terms are open" is a
+ * school decision, not a fact about the data: when Term 1 2027 is loaded,
+ * someone should have to decide to open it.
+ *
+ * `officialDays` is the printed figure, held here so the page can compare it to
+ * what the database actually holds and flag only the terms that disagree. Term
+ * 3 reconciled on 17 Aug 2026 when 27-28 August were confirmed as the Heroes
+ * Day long weekend; Term 4 still carries one unidentified extra day.
  */
-const OPEN_TERMS = ["Term 3 2026", "Term 4 2026"];
+const OPEN_TERMS = [
+  { term: "Term 3 2026", officialDays: 42 },
+  { term: "Term 4 2026", officialDays: 39 },
+];
+const OPEN_TERM_NAMES = OPEN_TERMS.map((t) => t.term);
 
 export default async function AttendancePage({
   searchParams,
@@ -43,7 +54,7 @@ export default async function AttendancePage({
         .from("academic_calendar")
         .select("date, term, label")
         .eq("day_type", "school_day")
-        .in("term", OPEN_TERMS)
+        .in("term", OPEN_TERM_NAMES)
         .order("date"),
       supabase
         .from("system_settings")
@@ -145,15 +156,19 @@ export default async function AttendancePage({
     }));
 
   const byTerm = OPEN_TERMS.map((t) => ({
-    term: t,
-    days: schoolDays.filter((d) => d.term === t).length,
+    term: t.term,
+    days: schoolDays.filter((d) => d.term === t.term).length,
+    officialDays: t.officialDays,
   }));
+  // Only the terms that actually disagree. Flagging a term that reconciles
+  // teaches teachers to ignore the warning.
+  const mismatched = byTerm.filter((t) => t.days !== t.officialDays);
 
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
         title="Attendance"
-        description={`Daily register for ${OPEN_TERMS.join(" and ")}. Present, absent, late or excused.`}
+        description={`Daily register for ${OPEN_TERM_NAMES.join(" and ")}. Present, absent, late or excused.`}
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
@@ -166,16 +181,24 @@ export default async function AttendancePage({
         />
       </div>
 
-      {variance && (
+      {mismatched.length > 0 && (
         <Notice tone="warning">
-          The calendar in this database holds{" "}
-          {byTerm.map((t) => `${t.days} school days in ${t.term}`).join(" and ")}
-          , which does not match the printed academy calendar (42 and 39). A
-          recorded variance of {JSON.stringify(variance.value).replace(/"/g, "")}{" "}
-          across 2026 is already noted in system settings. The extra days are
-          not identified, so they are offered here rather than dropped — mark
+          {mismatched
+            .map(
+              (t) =>
+                `${t.term} offers ${t.days} school days where the printed academy calendar has ${t.officialDays}`,
+            )
+            .join("; ")}
+          . The extra day
+          {mismatched.reduce((n, t) => n + (t.days - t.officialDays), 0) === 1
+            ? " is"
+            : "s are"}{" "}
+          not identified, so they are offered here rather than dropped — marking
           them <code className="font-mono text-xs">term_break</code> in the
-          calendar and they will disappear from this list.
+          academic calendar removes them from this list.
+          {variance
+            ? ` A variance of ${String(variance.value).replace(/"/g, "")} across 2026 is recorded in system settings.`
+            : ""}
         </Notice>
       )}
 
@@ -238,7 +261,7 @@ export default async function AttendancePage({
         </Notice>
       ) : schoolDays.length === 0 ? (
         <Notice tone="danger">
-          No school days are loaded for {OPEN_TERMS.join(" or ")}, so there is
+          No school days are loaded for {OPEN_TERM_NAMES.join(" or ")}, so there is
           nothing to mark. The academic calendar needs those terms before
           attendance can be taken.
         </Notice>
